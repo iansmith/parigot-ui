@@ -3,32 +3,50 @@ package driver
 import (
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/antlr/antlr4/runtime/Go/antlr/v4"
 	"github.com/iansmith/parigot-ui/parser"
 )
 
-const test1 = `text foo  {{ this is a template with embedded {{ stuff }} }}`
-const test2 = `text foo  {{ this is a template with embedded {{ bad stuff {{}} }} }}`
-const test3 = `text foo  {{ this is a template with embedded {{ {{}}bad {{{{}}}}stuff {{really bad stuff}}}}}}`
+const test1 = `text foo  {{ this is a template with embedded { fnCall()}}}`
+const test2 = `text foo(EN,v)  #to eol 
+{{ this is a template with embedded ${v} }}`
+const test3 = `text foo  {{ this is a template with embedded {functions()} and ${vars} }}`
+const test4 = `text _foo.bar  {{ this is a text blob that calls a function {f(x,y)} }}`
+const test5 = `
+#first one
+text foo {{ this is a test}} 
+      // second one
+bar{{ this is aloso a test}}`
 
-const mismatch1 = `text foo  {{ this is a template with embedded {{ bad stuff }} }} }}`
+const test6 = `css bootstrap {foo bar baz} simple {blech fleazil}`
+
+const mismatch1 = `text foo {{ this is a template with embedded { bad stuff }}`
+const badId1 = `text foo@bar`
+const badId2 = `text foo:bar`
+const twoTextSection1 = `text foo {{ this is a test}} text bar {{ should fail }}`
 
 func Main() {
-	expectedErrors := []int{0, 0, 0, 1}
-	for i, text := range []string{test1, test2, test3, mismatch1} {
+	expectedErrors := []int{0, 0, 0, 0, 0, 0, 2, 3, 3, 1}
+	for i, text := range []string{test1, test2, test3, test4, test5, test6, mismatch1, badId1, badId2, twoTextSection1} {
 		fmt.Printf("test is: %s\n", text)
 		el := errorListener{0}
 		input := antlr.NewInputStream(text)
-		lexer := parser.NewwclLexer(input)
+		lexer := parser.Newwcllex(input)
+		lexer.RemoveErrorListeners()
+		lexer.AddErrorListener(&el)
 		stream := antlr.NewCommonTokenStream(lexer, 0)
-		p := parser.NewwclParser(stream)
+		p := parser.Newwcl(stream)
+		p.RemoveErrorListeners()
 		p.AddErrorListener(&el)
 		p.Program()
 		if el.count != expectedErrors[i] {
-			panic(fmt.Sprintf("test %d failed (expected %d but got %d)", i, expectedErrors[i], el.count))
+			fmt.Printf("test %d failed (expected %d but got %d)", i, expectedErrors[i], el.count)
+			os.Exit(1)
 		}
 	}
+	os.Exit(0)
 }
 
 type errorListener struct {
@@ -36,7 +54,7 @@ type errorListener struct {
 }
 
 func (el *errorListener) SyntaxError(recognizer antlr.Recognizer, offendingSymbol interface{}, line, column int, msg string, e antlr.RecognitionException) {
-	log.Printf("xxxline %d:%d %s %v", line, column, msg, offendingSymbol)
+	log.Printf("syntax error %d:%d %s %v", line, column, msg, offendingSymbol)
 	el.count++
 }
 func (el *errorListener) ReportAmbiguity(recognizer antlr.Parser, dfa *antlr.DFA, startIndex, stopIndex int, exact bool, ambigAlts *antlr.BitSet, configs antlr.ATNConfigSet) {
@@ -44,7 +62,7 @@ func (el *errorListener) ReportAmbiguity(recognizer antlr.Parser, dfa *antlr.DFA
 	el.count++
 }
 func (el *errorListener) ReportAttemptingFullContext(recognizer antlr.Parser, dfa *antlr.DFA, startIndex, stopIndex int, conflictingAlts *antlr.BitSet, configs antlr.ATNConfigSet) {
-	log.Printf("attempting full context in DFA")
+	log.Printf("attempting full context in DFA:")
 	el.count++
 }
 func (el *errorListener) ReportContextSensitivity(recognizer antlr.Parser, dfa *antlr.DFA, startIndex, stopIndex, prediction int, configs antlr.ATNConfigSet) {

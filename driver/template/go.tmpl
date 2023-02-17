@@ -1,0 +1,8 @@
+import {
+    {{.import.Eval}}
+}
+
+{{range .text}}
+func {{.Parent.Name}}.{{.Name}}() {
+}
+{{end}}{{/*end range over all text objects*/}}

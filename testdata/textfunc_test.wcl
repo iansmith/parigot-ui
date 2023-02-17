@@ -1,0 +1,12 @@
+
+//
+// TestCase for the basic parts of a text functions
+//
+
+import {
+    "os"
+    "log"
+}
+
+text _foo 
+{{ this is a test }}

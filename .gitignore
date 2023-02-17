@@ -1,5 +1,8 @@
 .antlr
 parser/wcl.*
+!parser/*g4
 parser/wcllex*
 parser/wcl_*
 parser/antlr-4.11.1-complete.jar
+build/*
+wasm.g4

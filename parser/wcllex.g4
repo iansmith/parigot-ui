@@ -1,8 +1,11 @@
 lexer grammar wcllex;
 
-// Lexer
+// keywords
 Text: 'text';
 CSS: 'css';
+Import: 'import' -> pushMode(CONTENT);
+
+//ids
 Id: IdentFirst (IdentAfter)*;
 
 // consistent def of Ident
@@ -17,7 +20,7 @@ fragment IdentAfter: (
 	);
 
 fragment Digit: '0' ..'9';
-DoubleLeftCurly: '{{' {print("push(content)\n")} -> pushMode(CONTENT);
+DoubleLeftCurly: '{{' -> pushMode(CONTENT);
 LCurly: '{';
 RCurly: '}';
 LParen: '(';

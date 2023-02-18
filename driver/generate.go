@@ -14,7 +14,7 @@ var allLanguageTemplates = []string{golang}
 
 type generateContext struct {
 	templateName string
-	program      *parser.Program
+	program      *parser.ProgramNode
 	global       map[string]any
 	scope        *parser.ScopeStack
 }

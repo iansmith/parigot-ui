@@ -31,7 +31,8 @@ func Main() {
 	}
 	fp, err := os.Open(flag.Arg(0))
 	if err != nil {
-		log.Fatalf("opening %s: %v", flag.Arg(0), err)
+		wd, _ := os.Getwd()
+		log.Fatalf("opening %s: %v (wd is %s)", flag.Arg(0), err, wd)
 	}
 	buffer, err := io.ReadAll(fp)
 	if err != nil {
@@ -46,7 +47,10 @@ func Main() {
 	p := parser.Newwcl(stream)
 	p.RemoveErrorListeners()
 	p.AddErrorListener(&el)
+	listener := parser.WclGenListener{}
 	prog := p.Program()
+	antlr.ParseTreeWalkerDefault.Walk(&listener, prog)
+
 	// create a context for this generate
 	t, ok := langToTempl[*language]
 	if !ok {

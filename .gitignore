@@ -6,3 +6,4 @@ parser/wcl_*
 antlr-4.11.1-complete.jar
 build/*
 wasm.g4
+.vscode

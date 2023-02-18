@@ -1,15 +1,19 @@
 import {
-    {{- .import.String}}
+{{- if .import}}
+{{- .import.String}}
+{{end}}{{/* if */}}
     "bytes"
 }
 
+{{if .text }}
 {{range .text.Func}}
 func {{.Name}}(varCtx *VarCtx) string {
     var buf bytes.Buffer
     
-    {{range .Item -}}
-        {{ .Generate .VarCtx }}
-    {{end -}} {{/* end ranging item */}}
+{{range .Item -}}
+{{ .Generate .VarCtx }}
+{{end -}} {{/* end ranging item */}}
     return buf.String()
 }
 {{end}}{{/*end range over all text objects*/}}
+{{end}}{{/*end of if for is .text nil */}}

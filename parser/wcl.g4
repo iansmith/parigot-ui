@@ -4,65 +4,48 @@ options {
 }
 
 program
-	returns[*Program p]
-	@init {
-		$p=NewProgram()	
-	}:
-	i = import_section? {
-		if localctx.GetI()!=nil {
-			$p.ImportSection = $i.section
-		}
-	} t = text_section? { 
-		if localctx.GetT()!=nil {
-			$p.TextSection = localctx.GetT().GetSection()
-		}
-	} css_section? EOF;
+	returns[*ProgramNode p]:
+	import_section?  
+	text_section?    
+	css_section?     
+	EOF
+	;
 
 import_section
-	returns[*ImportSectionNode section]
-	@init {
-		$section = NewImportSectionNode()
-	}:
-	Import LCurly u=uninterp {
-		$section.Text = $u.item
-	};
+	returns[*ImportSectionNode section]:
+	Import LCurly uninterp 
+	;
 
 text_section
-	returns[*TextSectionNode section]
-	@init {
-		$section = NewTextSectionNode()
-	}:
+	returns[*TextSectionNode section]:
 	Text (
-		d = text_decl {
-			$section.Func=append($section.Func,localctx.GetD().GetF())
-		}
+		text_decl 
 	)*;
 
 text_decl
 	returns[*TextFuncNode f]:
-	i = Id param_spec? t = text_top { 
-		$f=NewTextFuncNode(localctx.GetI().GetText(),localctx.GetT().GetItem())
-	};
+	i = Id param_spec? text_top 
+	;
 
 text_top
 	returns[[]TextItem item]:
 	DoubleLeftCurly (
-		content = text_content {$item = localctx.GetContent().GetItem()}
+		text_content 
 		|
 	) DoubleRightCurly;
 
 text_content
-	returns[[]TextItem item]
-	@init {
-		$item = []TextItem{}
-	}:
+	returns[[]TextItem item]:
 	(
-		c = ContentRawText { $item = append($item, NewTextConstant(localctx.GetC().GetText()))}
-		| v = var_subs { }
-		| ContentLCurly u=uninterp { $item = append($item, $u.item...)
-		print("at the site ",len($item),"\n")
-		}
+		text_content_inner    
 	)*;
+
+text_content_inner
+	returns[[]TextItem item]:
+		ContentRawText             	#RawText
+		| var_subs   				#VarSub
+		| ContentLCurly uninterp   	#Unint
+;
 
 var_subs: ContentDollar sub;
 

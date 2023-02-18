@@ -11,7 +11,9 @@ import {
 
 ///////////////// TEXT /////////////////
 text
+// we will rip out the first and last unicode space if you provide both
 _foo{{ Hello, 世界 }}
 _bar{{test1}}
+// but we leave it alone if you only provide one
 _baz{{ test2}}
 _quux{{test3 }}

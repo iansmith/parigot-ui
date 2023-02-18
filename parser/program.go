@@ -1,11 +1,11 @@
 package parser
 
-type Program struct {
+type ProgramNode struct {
 	ImportSection *ImportSectionNode
 	CSSSection    *CSSSectionNode
 	TextSection   *TextSectionNode
 }
 
-func NewProgram() *Program {
-	return &Program{}
+func NewProgramNode() *ProgramNode {
+	return &ProgramNode{}
 }

@@ -54,11 +54,15 @@ func (t *TextVar) String() string {
 }
 
 func (t *TextVar) Generate(_ *VarCtx) string {
-	return fmt.Sprintf("buf WriteString(%s)\n", t.Name)
+	return fmt.Sprintf("buf.WriteString(%s)\n", t.Name)
 }
 
 func (t *TextVar) VarCtx() *VarCtx {
 	return t._VarCtx
+}
+
+func NewTextVar() *TextVar {
+	return &TextVar{}
 }
 
 // TextItem is something that knows how to print itself.
@@ -96,8 +100,8 @@ func (t *TextFuncNode) String() string {
 	return buf.String()
 }
 
-func NewTextFuncNode(name string, item []TextItem) *TextFuncNode {
-	return &TextFuncNode{Name: name, _Item: item}
+func NewTextFuncNode() *TextFuncNode {
+	return &TextFuncNode{}
 }
 
 // TestSection is the collection of text functions.

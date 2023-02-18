@@ -3,10 +3,15 @@
 // TestCase for the basic parts of a text functions
 //
 
+///////////////// IMPORT /////////////////
+// Note that this is not copied directly, although it may look that way in
+// the output.  This text blob can have ${foo} references in it.
 import {
-    "os"
-    "log"
 }
 
-text _foo 
-{{ this is a test }}
+///////////////// TEXT /////////////////
+text
+_foo{{ Hello, 世界 }}
+_bar{{test1}}
+_baz{{ test2}}
+_quux{{test3 }}

@@ -3,7 +3,7 @@ lexer grammar wcllex;
 // keywords
 Text: 'text';
 CSS: 'css';
-Import: 'import' -> pushMode(CONTENT);
+Import: 'import';
 
 //ids
 Id: IdentFirst (IdentAfter)*;
@@ -21,7 +21,7 @@ fragment IdentAfter: (
 
 fragment Digit: '0' ..'9';
 DoubleLeftCurly: '{{' -> pushMode(CONTENT);
-LCurly: '{';
+LCurly: '{' -> pushMode(UNINTERPRETED);
 RCurly: '}';
 LParen: '(';
 RParen: ')';

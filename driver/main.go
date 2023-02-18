@@ -47,7 +47,6 @@ func Main() {
 	p.RemoveErrorListeners()
 	p.AddErrorListener(&el)
 	prog := p.Program()
-
 	// create a context for this generate
 	t, ok := langToTempl[*language]
 	if !ok {
@@ -56,7 +55,11 @@ func Main() {
 	ctx := newGenerateContext(t)
 	GlobalScopeStack = ctx.scope // pointer copy
 	ctx.program = prog.GetP()
+	ctx.templateName = t
 	ctx.global["import"] = prog.GetP().ImportSection
 	ctx.global["text"] = prog.GetP().TextSection
-	runTemplate(ctx)
+	err = runTemplate(ctx)
+	if err != nil {
+		log.Fatalf("error trying to execute template %s: %v", ctx.templateName, err)
+	}
 }

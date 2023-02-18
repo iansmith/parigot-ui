@@ -1,0 +1,12 @@
+import {
+    "os"
+    "log"
+    "bytes"
+}
+
+
+func _foo(_varctx *VarCtx) string {
+    var buf bytes.Buffer
+     buf.WriteString("this is a test")
+     return buf.String()
+}

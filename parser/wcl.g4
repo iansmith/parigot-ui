@@ -8,17 +8,23 @@ program
 	@init {
 		$p=NewProgram()	
 	}:
-	i = import_section? { $p.ImportSection = localctx.GetI().GetSection()
-	} t = text_section? { $p.TextSection = localctx.GetT().GetSection()
-		} css_section? EOF;
+	i = import_section? {
+		if localctx.GetI()!=nil {
+			$p.ImportSection = $i.section
+		}
+	} t = text_section? { 
+		if localctx.GetT()!=nil {
+			$p.TextSection = localctx.GetT().GetSection()
+		}
+	} css_section? EOF;
 
 import_section
 	returns[*ImportSectionNode section]
 	@init {
 		$section = NewImportSectionNode()
 	}:
-	Import u = uninterp {
-		$section.Text = localctx.GetU().GetItem()[0];
+	Import LCurly u=uninterp {
+		$section.Text = $u.item
 	};
 
 text_section
@@ -27,13 +33,16 @@ text_section
 		$section = NewTextSectionNode()
 	}:
 	Text (
-		d = text_decl {$section.Func=append($section.Func,localctx.GetD().GetF())}
+		d = text_decl {
+			$section.Func=append($section.Func,localctx.GetD().GetF())
+		}
 	)*;
 
 text_decl
 	returns[*TextFuncNode f]:
 	i = Id param_spec? t = text_top { 
-		$f=NewTextFuncNode(localctx.GetI().GetText(),localctx.GetT().GetItem())};
+		$f=NewTextFuncNode(localctx.GetI().GetText(),localctx.GetT().GetItem())
+	};
 
 text_top
 	returns[[]TextItem item]:
@@ -50,7 +59,9 @@ text_content
 	(
 		c = ContentRawText { $item = append($item, NewTextConstant(localctx.GetC().GetText()))}
 		| v = var_subs { }
-		| u = uninterp { $item = append($item, localctx.GetU().GetItem()...)}
+		| ContentLCurly u=uninterp { $item = append($item, $u.item...)
+		print("at the site ",len($item),"\n")
+		}
 	)*;
 
 var_subs: ContentDollar sub;
@@ -63,9 +74,11 @@ uninterp
 		$item=[]TextItem{}
 	}:
 	// jump from content mode to Uninterp mode
-	ContentLCurly (
-		c = UninterpRawText { $item = append($item, NewTextConstant(localctx.GetC().GetText()))}
-		| u = nestedUninterp { $item = append($item, localctx.GetU().GetItem()...)}
+	(
+		c = UninterpRawText { $item = append($item, NewTextConstant(localctx.GetC().GetText()))
+		}
+		| u = nestedUninterp { $item = append($item, localctx.GetU().GetItem()...)
+		}
 		| UninterpDollar sub
 	)+ UninterpRCurly;
 

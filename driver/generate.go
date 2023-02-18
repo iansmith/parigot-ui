@@ -2,8 +2,8 @@ package driver
 
 import (
 	"fmt"
-	"html/template"
 	"os"
+	"text/template"
 
 	"github.com/iansmith/parigot-ui/parser"
 )

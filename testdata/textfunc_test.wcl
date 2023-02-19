@@ -3,20 +3,23 @@
 // TestCase for the basic parts of a text functions
 //
 
-///////////////// IMPORT /////////////////
-// Duplicate "import" because the outer one is for WCL and the
-// inner one for go language.
-import {
-package foo
-
+///////////////// PREAMBLE /////////////////
+@preamble {
 import (
+    "bytes"  // always required by wcl
     "os"
     "fmt"
 )
+var verbose = true
 }
 
 ///////////////// TEXT /////////////////
-text
-_foo{{Hello, 世界 ${chinese}}}
-_bar{{test1{moreTest1()}}}
-_baz{{fleazil}}
+@text
+foo{{Hello, 世界 ${chinese}}}
+bar{{test1{
+    if verbose {
+        moreTest1()
+    }
+    }}}
+baz(salutation string, firstName string, lastName string) 
+{{ Greetings ${salutation} ${firstName} ${lastName} }}

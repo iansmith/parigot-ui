@@ -6,9 +6,9 @@ options {
 program
 	returns[*ProgramNode p]:
 	import_section?  
-	text_section?    
+	text_section? 
 	css_section?     
-	EOF
+	EOF   
 	;
 
 import_section
@@ -66,30 +66,23 @@ uninterp
 uninterp_inner 
 	returns [[]TextItem Item]:
 	UninterpRawText #UninterpRawText
-	| nestedUninterp #UninterpNested
+	| UninterpLCurly uninterp  #UninterpNested
 	| uninterp_var #UninterpVar
 ;
-
-nestedUninterp
-	returns[[]TextItem item]
-	@init {
-		$item=[]TextItem{}
-	}:
-	UninterpLCurly {} (
-		c = UninterpRawText { $item = append($item, NewTextConstant(localctx.GetC().GetText()))}
-		| UninterpDollar sub
-		| u = nestedUninterp { $item = append($item, localctx.GetU().GetItem()...)}
-	)+ UninterpRCurly;
 
 uninterp_var
 	returns[[]TextItem item]: 
 	UninterpDollar Id;
 
-param_spec: LParen param_seq RParen;
+param_spec
+	returns[[]*PFormal formal]: 
+	LParen (param_pair)* RParen;
 
-param_seq: (Id Comma)+? Id |;
-
-param_rest: Comma param_seq;
+param_pair
+	returns[[]*PFormal formal]:
+	n=Id t=Id Comma    	#Pair
+	| n=Id t=Id         #Last
+	;
 
 css_section: CSS css_file*;
 

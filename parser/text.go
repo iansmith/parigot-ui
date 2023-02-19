@@ -95,11 +95,23 @@ type TextExpander interface {
 	Item() []TextItem
 }
 
+// PFormal holds a parameter and type pair.
+type PFormal struct {
+	Name string
+	Type string
+}
+
+func NewPFormal(n, t string) *PFormal {
+	return &PFormal{Name: n, Type: t}
+}
+
 // TextFuncNode is the that alls the information about a declared
 // text function.
 type TextFuncNode struct {
-	Name  string
-	_Item []TextItem
+	Name      string
+	NumParams int
+	Param     []*PFormal
+	_Item     []TextItem
 }
 
 func (t *TextFuncNode) Item() []TextItem {

@@ -1,9 +1,9 @@
 lexer grammar wcllex;
 
 // keywords
-Text: 'text';
-CSS: 'css';
-Import: 'import';
+Text: '@text';
+CSS: '@css';
+Import: '@preamble';
 
 //ids
 Id: IdentFirst (IdentAfter)*;

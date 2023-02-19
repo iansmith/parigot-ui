@@ -2,7 +2,7 @@ package driver
 
 import (
 	"fmt"
-	"os"
+	"io"
 	"text/template"
 
 	"github.com/iansmith/parigot-ui/parser"
@@ -27,7 +27,7 @@ func newGenerateContext(languageName string) *generateContext {
 	}
 }
 
-func runTemplate(ctx *generateContext) error {
+func runTemplate(ctx *generateContext, out io.Writer) error {
 	root, err := loadTemplates()
 	if err != nil {
 		return err
@@ -36,7 +36,7 @@ func runTemplate(ctx *generateContext) error {
 	if t == nil {
 		return err
 	}
-	return t.Execute(os.Stdout, ctx.global)
+	return t.Execute(out, ctx.global)
 }
 
 // loadTemplates not only loads the templates proper from the embedded FS but

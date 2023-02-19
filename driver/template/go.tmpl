@@ -1,11 +1,14 @@
+{{/* ----------------------------------------------------- */}}
 {{- define "TextConstant" -}}
 {{- .Value -}}
 {{- end -}}{{/* template TextConstant */}}
 
+{{/* ----------------------------------------------------- */}}
 {{- define "TextVar" -}}
-GetVar({{.Name}})
+fmt.Sprint({{.Name}})
 {{- end -}} {{/* template TextVar */}}
 
+{{/* ----------------------------------------------------- */}}
 {{- define "TextInline" -}}
 {{- range . -}}
 {{- $subtemplate := .SubTemplate -}}
@@ -24,29 +27,37 @@ GetVar({{.Name}})
 {{- end -}} {{/* end of ranging over text objects */}}
 {{- end -}} {{/* template TextInline*/}}
 
+{{/* ----------------------------------------------------- */}}
+{{- define "ParamFormal" -}}
+{{- if . }}
+{{- range . }}
+{{- .Name }} {{ .Type -}},
+{{- end }} {{/* end of ranging over param list */}}
+{{- end }} {{/*end of if */}}
+{{- end }} {{/* end of template ParamFormal */}}
+
+{{/* ----------------------------------------------------- */}}
 {{/* PROGRAM GEN */}}
+{{/* ----------------------------------------------------- */}}
+package {{.golang.package}}
+
 {{- if .import -}}
 {{- template "TextInline" .import.TextItem_}}
 {{- end -}}{{/* if */}}
 
-import (
-    "bytes"
-)
 
 {{if .text }}
 {{range .text.Func}}
-func {{.Name}}(varCtx *VarCtx) string {
+func {{.Name -}}({{- template "ParamFormal" .Param -}}) string {
     var buf bytes.Buffer
 {{ range .Item -}}
 {{- $subtemplate := .SubTemplate -}}
 
-{{/* we have to do this crap with 3 cases explicitly because "template" 
-can only take a literal string as its first parameter */}}
 {{- if eq $subtemplate "TextConstant" -}}
 buf.WriteString(`{{- template "TextConstant" . -}}`)
 {{ end }}{{/*TextConstant*/ -}}
 {{- if eq $subtemplate "TextVar" -}}
-{{ template "TextVar" . }}
+buf.WriteString({{ template "TextVar" . }})
 {{ end }} {{/*TextVar*/}}
 {{- if eq $subtemplate "TextInline" -}}
 {{ template "TextInline" .TextItem_ }}

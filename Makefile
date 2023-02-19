@@ -13,9 +13,16 @@ parser/wcl_parser.go: parser/wcl.g4
 parser/wcllex_lexer.go: parser/wcllex.g4 
 	cd parser;./generate.sh
 
-build/wcl: driver/*.go driver/template/*.tmpl parser/*.go
+build/wcl: driver/*.go driver/template/*.tmpl parser/*.go parser/wcl_parser.go parser/wcllex_lexer.go
 	go build -o build/wcl github.com/iansmith/parigot-ui/cmd/wcl
 
 .PHONY: comptest
 comptest: build/wcl
 	build/wcl testdata/textfunc_test.wcl 
+
+.PHONY: parserclean
+parserclean:
+	rm parser/wcl.interp parser/wcl.tokens \
+	parser/wcl_base_listener.go parser/wcl_listener.go \
+	parser/wcl_parser.go parser/wcllex.interp \
+	parser/wcllex.tokens parser/wcllex_lexer.go

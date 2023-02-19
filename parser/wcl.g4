@@ -8,6 +8,7 @@ program
 	import_section?  
 	text_section? 
 	css_section?     
+	doc_section?
 	EOF   
 	;
 
@@ -89,3 +90,47 @@ css_section: CSS css_file*;
 css_file: Id LCurly css_decl* RCurly;
 
 css_decl: Id;
+
+doc_section: Doc (Id doc_sexpr)*;
+
+doc_tag:
+	LessThan Id 
+	doc_id?
+	doc_class?
+	GreaterThan 
+	;
+
+doc_id:
+	Hash Id
+	;
+
+doc_class:
+	(Colon Id)+
+	;
+
+doc_atom:
+	doc_tag 
+	doc_node_content
+;
+doc_node_content:
+	text_top?
+	| text_func_call
+	|
+	;
+
+text_func_call:
+	Id LParen RParen;
+
+doc_item:
+	doc_atom
+	| doc_list
+	;
+
+doc_sexpr:
+	doc_atom
+	| doc_list
+	;
+
+doc_list:
+	LParen doc_item* RParen 
+	;

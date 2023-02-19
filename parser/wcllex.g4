@@ -4,6 +4,7 @@ lexer grammar wcllex;
 Text: '@text';
 CSS: '@css';
 Import: '@preamble';
+Doc: '@doc';
 
 //ids
 Id: IdentFirst (IdentAfter)*;
@@ -20,6 +21,7 @@ fragment IdentAfter: (
 	);
 
 fragment Digit: '0' ..'9';
+
 DoubleLeftCurly: '{{' -> pushMode(CONTENT);
 LCurly: '{' -> pushMode(UNINTERPRETED);
 RCurly: '}';
@@ -27,7 +29,11 @@ LParen: '(';
 RParen: ')';
 Dollar: '$';
 Comma: ',';
-PoundComment: '#' .+? [\n\r] -> skip;
+LessThan: '<';
+GreaterThan: '>';
+Colon: ':';
+Hash: '#';
+
 DoubleSlashComment: '//' .+? [\n\r] -> skip;
 Whitespace: [ \n\r\t\u000B\u000C\u0000]+ -> skip;
 

@@ -118,7 +118,7 @@ func readInput(path string) (*parser.WclBuildListener, *parser.WCLParser) {
 	fp, err := os.Open(path)
 	if err != nil {
 		wd, _ := os.Getwd()
-		wclFatalf("opening %s: %v (wd is %s)", flag.Arg(0), err, wd)
+		wclFatalf("%v (wd is %s)", flag.Arg(0), err, wd)
 	}
 	buffer, err := io.ReadAll(fp)
 	if err != nil {

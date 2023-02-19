@@ -1,0 +1,15 @@
+//
+// Fail if text func name and param have the same name
+//
+
+///////////////// PREAMBLE /////////////////
+@preamble {
+import (
+    "bytes"  // always required by wcl
+)
+}
+
+///////////////// TEXT /////////////////
+@text
+foo(bar string){{Hello}}
+bar(bar string){{Hello}}

@@ -22,7 +22,16 @@ comptest: build/wcl
 
 .PHONY: parserclean
 parserclean:
-	rm parser/wcl.interp parser/wcl.tokens \
+	rm -f parser/wcl.interp parser/wcl.tokens \
 	parser/wcl_base_listener.go parser/wcl_listener.go \
 	parser/wcl_parser.go parser/wcllex.interp \
-	parser/wcllex.tokens parser/wcllex_lexer.go
+	parser/wcllex.tokens parser/wcllex_lexer.go \
+	parser/wcl_visitor.go parser/wcl_base_visitor.go
+
+semfailtest: build/wcl
+	build/wcl -invert testdata/fail_dupparam.wcl 
+	build/wcl -invert testdata/fail_duptextname.wcl 
+	build/wcl -invert testdata/fail_duptextnameparam.wcl 
+
+semtest: build/wcl
+	build/wcl -o /dev/null testdata/textfunc_test.wcl

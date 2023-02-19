@@ -47,23 +47,28 @@ text_content_inner
 		| ContentLCurly uninterp   	#Unint
 ;
 
-var_subs: ContentDollar sub;
+var_subs
+	returns [[]TextItem item]: 
+	ContentDollar sub
+	;
 
-sub: VarLCurly VarId VarRCurly;
+sub
+	returns [TextItem item]: 
+	VarLCurly VarId VarRCurly
+	;
 
 uninterp
-	returns[[]TextItem item]
-	@init {
-		$item=[]TextItem{}
-	}:
-	// jump from content mode to Uninterp mode
+	returns[[]TextItem item]:
 	(
-		c = UninterpRawText { $item = append($item, NewTextConstant(localctx.GetC().GetText()))
-		}
-		| u = nestedUninterp { $item = append($item, localctx.GetU().GetItem()...)
-		}
-		| UninterpDollar sub
+		uninterp_inner
 	)+ UninterpRCurly;
+
+uninterp_inner 
+	returns [[]TextItem Item]:
+	UninterpRawText #UninterpRawText
+	| nestedUninterp #UninterpNested
+	| uninterp_var #UninterpVar
+;
 
 nestedUninterp
 	returns[[]TextItem item]
@@ -76,7 +81,9 @@ nestedUninterp
 		| u = nestedUninterp { $item = append($item, localctx.GetU().GetItem()...)}
 	)+ UninterpRCurly;
 
-uninterpVar: UninterpDollar Id;
+uninterp_var
+	returns[[]TextItem item]: 
+	UninterpDollar Id;
 
 param_spec: LParen param_seq RParen;
 

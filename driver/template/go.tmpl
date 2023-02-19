@@ -1,19 +1,59 @@
-import {
-{{- if .import}}
-{{- .import.String}}
-{{end}}{{/* if */}}
+{{- define "TextConstant" -}}
+{{- .Value -}}
+{{- end -}}{{/* template TextConstant */}}
+
+{{- define "TextVar" -}}
+GetVar({{.Name}})
+{{- end -}} {{/* template TextVar */}}
+
+{{- define "TextInline" -}}
+{{- range . -}}
+{{- $subtemplate := .SubTemplate -}}
+
+{{- if eq $subtemplate "TextConstant" -}}
+{{- template "TextConstant" . -}}
+{{- end -}}{{/*TextConstant*/}}
+
+{{- if eq $subtemplate "TextVar" }}
+{{ template "TextVar" . }}
+{{- end -}} {{/*TextVar*/}}
+{{- if eq $subtemplate "TextInline" }}
+// Inline Code Sections Do Not Nest
+{{- end -}} {{/*TextInline*/}}
+
+{{- end -}} {{/* end of ranging over text objects */}}
+{{- end -}} {{/* template TextInline*/}}
+
+{{/* PROGRAM GEN */}}
+{{- if .import -}}
+{{- template "TextInline" .import.TextItem_}}
+{{- end -}}{{/* if */}}
+
+import (
     "bytes"
-}
+)
 
 {{if .text }}
 {{range .text.Func}}
 func {{.Name}}(varCtx *VarCtx) string {
     var buf bytes.Buffer
-    
-{{range .Item -}}
-{{ .Generate .VarCtx }}
-{{end -}} {{/* end ranging item */}}
+{{ range .Item -}}
+{{- $subtemplate := .SubTemplate -}}
+
+{{/* we have to do this crap with 3 cases explicitly because "template" 
+can only take a literal string as its first parameter */}}
+{{- if eq $subtemplate "TextConstant" -}}
+buf.WriteString(`{{- template "TextConstant" . -}}`)
+{{ end }}{{/*TextConstant*/ -}}
+{{- if eq $subtemplate "TextVar" -}}
+{{ template "TextVar" . }}
+{{ end }} {{/*TextVar*/}}
+{{- if eq $subtemplate "TextInline" -}}
+{{ template "TextInline" .TextItem_ }}
+{{end }} {{/*TextInline*/}}
+{{- end }} {{/* end ranging item */ -}}
     return buf.String()
 }
 {{end}}{{/*end range over all text objects*/}}
+
 {{end}}{{/*end of if for is .text nil */}}

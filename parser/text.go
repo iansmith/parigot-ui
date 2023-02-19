@@ -1,10 +1,7 @@
 package parser
 
 import (
-	"bytes"
 	"fmt"
-	"unicode"
-	"unicode/utf8"
 )
 
 // TextConstant is a simple string.
@@ -19,19 +16,6 @@ func (t *TextConstant) String() string {
 
 func (t *TextConstant) Generate(_ *VarCtx) string {
 	value := t.Value
-	if utf8.RuneCountInString(value) == -1 {
-		panic("not a utf8 string:" + value)
-	}
-	if utf8.RuneCountInString(value) > 2 {
-		first, fCount := utf8.DecodeRuneInString(value)
-		last, lCount := utf8.DecodeLastRuneInString(value)
-		if first == utf8.RuneError || last == utf8.RuneError {
-			panic("not a utf8 string:" + value)
-		}
-		if unicode.IsSpace(first) && unicode.IsSpace(last) {
-			value = t.Value[fCount : len(t.Value)-lCount]
-		}
-	}
 	return fmt.Sprintf("buf WriteString(%q)\n", value)
 }
 
@@ -41,6 +25,9 @@ func (t *TextConstant) VarCtx() *VarCtx {
 
 func NewTextConstant(s string) *TextConstant {
 	return &TextConstant{_VarCtx: nil, Value: s}
+}
+func (t *TextConstant) SubTemplate() string {
+	return "TextConstant"
 }
 
 // TextVar is a text variable that in source form is ${foo}
@@ -54,22 +41,53 @@ func (t *TextVar) String() string {
 }
 
 func (t *TextVar) Generate(_ *VarCtx) string {
-	return fmt.Sprintf("buf.WriteString(%s)\n", t.Name)
+	return fmt.Sprintf("LookupVar(%s)\n", t.Name)
 }
 
 func (t *TextVar) VarCtx() *VarCtx {
 	return t._VarCtx
 }
 
-func NewTextVar() *TextVar {
-	return &TextVar{}
+func NewTextVar(n string) *TextVar {
+	return &TextVar{Name: n}
+}
+func (t *TextVar) SubTemplate() string {
+	return "TextVar"
 }
 
-// TextItem is something that knows how to print itself.
+// TextInline is a blob of code to copied into the output.
+type TextInline struct {
+	Name      string
+	_VarCtx   *VarCtx
+	TextItem_ []TextItem
+}
+
+func (t *TextInline) String() string {
+	return "BLEAH NOT AVAILABLE"
+}
+
+func (t *TextInline) Generate(_ *VarCtx) string {
+	return "BLEAH NOT AVAILABLE Generate"
+}
+
+func (t *TextInline) VarCtx() *VarCtx {
+	return t._VarCtx
+}
+
+func NewTextInline() *TextInline {
+	return &TextInline{}
+}
+
+func (t *TextInline) SubTemplate() string {
+	return "TextInline"
+}
+
+// TextItem is an interface that represents the things that we
+// know how to place inside a text unit.
 type TextItem interface {
-	String() string
-	Generate(*VarCtx) string
+	//String() string
 	VarCtx() *VarCtx
+	SubTemplate() string
 }
 
 // TextExpander is something that can have variables uses in it.
@@ -92,13 +110,13 @@ func (t *TextFuncNode) SetItem(item []TextItem) {
 	t._Item = item
 }
 
-func (t *TextFuncNode) String() string {
-	var buf bytes.Buffer
-	for _, t := range t._Item {
-		buf.WriteString(t.String())
-	}
-	return buf.String()
-}
+// func (t *TextFuncNode) String() string {
+// 	var buf bytes.Buffer
+// 	for _, t := range t._Item {
+// 		buf.WriteString(t.String())
+// 	}
+// 	return buf.String()
+// }
 
 func NewTextFuncNode() *TextFuncNode {
 	return &TextFuncNode{}

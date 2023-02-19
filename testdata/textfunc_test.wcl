@@ -4,16 +4,19 @@
 //
 
 ///////////////// IMPORT /////////////////
-// Note that this is not copied directly, although it may look that way in
-// the output.  This text blob can have ${foo} references in it.
+// Duplicate "import" because the outer one is for WCL and the
+// inner one for go language.
 import {
+package foo
+
+import (
+    "os"
+    "fmt"
+)
 }
 
 ///////////////// TEXT /////////////////
 text
-// we will rip out the first and last unicode space if you provide both
-_foo{{ Hello, 世界 }}
-_bar{{test1}}
-// but we leave it alone if you only provide one
-_baz{{ test2}}
-_quux{{test3 }}
+_foo{{Hello, 世界 ${chinese}}}
+_bar{{test1{moreTest1()}}}
+_baz{{fleazil}}

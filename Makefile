@@ -1,7 +1,7 @@
 all: build/wcl
 
 .PHONY: syntaxtest
-test:syntaxtest comptest
+test: semfailtest semtest
 
 .PHONY: syntaxtest
 syntaxtest: parser/wcl_parser.go parser/wcllex_lexer.go syntaxtest/main.go
@@ -16,9 +16,6 @@ parser/wcllex_lexer.go: parser/wcllex.g4
 build/wcl: driver/*.go driver/template/*.tmpl parser/*.go parser/wcl_parser.go parser/wcllex_lexer.go
 	go build -o build/wcl github.com/iansmith/parigot-ui/cmd/wcl
 
-.PHONY: comptest
-comptest: build/wcl
-	build/wcl testdata/textfunc_test.wcl 
 
 .PHONY: parserclean
 parserclean:
@@ -35,3 +32,4 @@ semfailtest: build/wcl
 
 semtest: build/wcl
 	build/wcl -o /dev/null testdata/textfunc_test.wcl
+	build/wcl -o /dev/null testdata/doc_test.wcl

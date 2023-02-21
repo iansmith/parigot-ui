@@ -1,0 +1,18 @@
+//
+// Fail if text func name repeated
+//
+
+///////////////// PREAMBLE /////////////////
+@preamble {
+import (
+    "bytes"  // always required by wcl
+)
+}
+
+///////////////// TEXT /////////////////
+@text
+foo{{Hello}}
+bar{{Hello}}
+@doc
+baz (<p>)
+foo (<h1>)

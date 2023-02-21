@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/antlr/antlr4/runtime/Go/antlr/v4"
@@ -8,8 +9,8 @@ import (
 
 type NameCheck struct {
 	*BasewclVisitor
-	Passed   bool
-	TextFunc map[string]struct{}
+	Passed bool
+	Func   map[string]bool
 }
 
 var _ wclVisitor = &NameCheck{}
@@ -19,8 +20,8 @@ func NewNameCheck() *NameCheck {
 		BasewclVisitor: &BasewclVisitor{
 			BaseParseTreeVisitor: &antlr.BaseParseTreeVisitor{},
 		},
-		Passed:   true,
-		TextFunc: make(map[string]struct{}),
+		Passed: true,
+		Func:   make(map[string]bool),
 	}
 }
 
@@ -58,12 +59,14 @@ func (n *NameCheck) VisitText_decl(ctx *Text_declContext) interface{} {
 // VisitText_section checks that all the text functions' names are distinct.
 func (n *NameCheck) VisitText_section(ctx *Text_sectionContext) interface{} {
 	for _, node := range ctx.GetSection().Func {
-		if _, ok := n.TextFunc[node.Name]; ok {
-			log.Printf("text function name '%s' used more than once", node.Name)
+		ok := n.checkFuncName(node.Name, true)
+		if !ok {
+			msg := fmt.Sprintf("text function name '%s' used more than once", node.Name)
+			ex := antlr.NewBaseRecognitionException(msg, ctx.GetParser(), ctx.GetParser().GetInputStream(), ctx)
+			ctx.SetException(ex)
 			n.Passed = false
 			return nil
 		}
-		n.TextFunc[node.Name] = struct{}{}
 	}
 	for _, decl := range ctx.AllText_decl() {
 		n.Visit(decl)
@@ -71,11 +74,66 @@ func (n *NameCheck) VisitText_section(ctx *Text_sectionContext) interface{} {
 	return nil
 }
 
+// VisitDoc_section checks that all the doc functions' names are distinct.
+func (n *NameCheck) VisitDoc_section(ctx *Doc_sectionContext) interface{} {
+	for _, node := range ctx.GetSection().DocFunc {
+		log.Printf("name check %s", node.Name)
+		ok := n.checkFuncName(node.Name, false)
+		if !ok {
+			msg := fmt.Sprintf("doc function name '%s' used more than once", node.Name)
+			ex := antlr.NewBaseRecognitionException(msg, ctx.GetParser(), ctx.GetParser().GetInputStream(), ctx)
+			ctx.SetException(ex)
+			n.Passed = false
+			return nil
+		}
+	}
+	for _, sexpr := range ctx.AllDoc_sexpr() {
+		n.Visit(sexpr)
+	}
+	return nil
+
+}
+
+// checkFuncName checks to see if the specified function is already
+// present.
+func (n *NameCheck) checkFuncName(name string, isText bool) bool {
+	typeOfFunc := "doc"
+	other := "text"
+	if isText {
+		typeOfFunc = "text"
+		other = "doc"
+	}
+
+	if b, ok := n.Func[name]; ok {
+		if b == isText {
+			if isText {
+				log.Printf("two text functions named '%s'", name)
+			} else {
+				log.Printf("two doc functions named '%s'", name)
+			}
+		} else {
+			log.Printf("%s function '%s' conflicts with %s function", typeOfFunc, name, other)
+		}
+		return false
+	}
+	n.Func[name] = isText
+	return true
+}
+
 // //////////////////////////////// BOILERPLATE /////////////////////////////
 func (n *NameCheck) VisitProgram(ctx *ProgramContext) interface{} {
-	return n.Visit(ctx.Text_section())
+	return n.VisitChildren(ctx)
 }
 
 func (n *NameCheck) Visit(tree antlr.ParseTree) interface{} {
 	return tree.Accept(n)
+}
+func (n *NameCheck) VisitChildren(ctx antlr.RuleNode) interface{} {
+	count := ctx.GetChildCount()
+	var last interface{}
+	for i := 0; i < count; i++ {
+		tree := ctx.GetChild(i).(antlr.ParseTree)
+		last = n.Visit(tree)
+	}
+	return last
 }

@@ -122,14 +122,6 @@ func (t *TextFuncNode) SetItem(item []TextItem) {
 	t._Item = item
 }
 
-// func (t *TextFuncNode) String() string {
-// 	var buf bytes.Buffer
-// 	for _, t := range t._Item {
-// 		buf.WriteString(t.String())
-// 	}
-// 	return buf.String()
-// }
-
 func NewTextFuncNode() *TextFuncNode {
 	return &TextFuncNode{}
 }

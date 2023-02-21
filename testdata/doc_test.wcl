@@ -3,7 +3,7 @@
 // TestCase for the basic parts of a text functions
 //
 
-///////////////// PREAMBLE /////////////////
+/////////////////// PREAMBLE /////////////////
 @preamble {
 import (
     "bytes"  // always required by wcl
@@ -15,19 +15,19 @@ foo{{Hello, 世界}}
 
 ///////////////// DOC /////////////////
 @doc
-onlyAtom <br>
-onlyAtomInList (<br>)
-atomInListWithLiteral (<br #blah :blech :foobie> {{literal string here}})
-atomInListWithCall (<br #blah :fleazil :frik :frak :quux> foo())
-peers (
-    <h1>{{foo}}
-    <h2>{{bar}}
-    <p>foo()
-)
-deeplyNested (<p>(<p>(<p>(<p>(<p>(<p> foo()))))))
-silly (((((((<p>{{some content}})))))))
+onlyAtom <br> {{example anonymous function}}
+//onlyAtomInList (<br>)
+//atomInListWithLiteral (<br #blah :blech :foobie> {{literal string here}})
+//atomInListWithCall (<br #blah :fleazil :frik :frak :quux> foo())
+//peers (
+    //<h1>{{foo}}
+    //<h2>{{bar}}
+    //<p>foo()
+//)
+//deeplyNested (<p>(<p>(<p>(<p>(<p>(<p> foo()))))))
+//silly (((((((<p>{{some content}})))))))
 exampleList (<ul> 
     (<li>{{one}} 
-    <li>{{two}}
-    <li>{{three}}))
-
+  <li>{{two}}
+  <li>{{three}})
+  )

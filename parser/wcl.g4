@@ -91,46 +91,54 @@ css_file: Id LCurly css_decl* RCurly;
 
 css_decl: Id;
 
-doc_section: Doc (Id doc_sexpr)*;
+doc_section
+	returns [*DocSectionNode section]: 
+	Doc (Id doc_sexpr)*;
 
-doc_tag:
+doc_tag
+	returns [*DocTag tag]:
 	LessThan Id 
 	doc_id?
 	doc_class?
 	GreaterThan 
 	;
 
-doc_id:
+doc_id
+	returns [string s]:
 	Hash Id
 	;
 
-doc_class:
+doc_class
+	returns [[]string clazz]:
 	(Colon Id)+
 	;
 
-doc_atom:
-	doc_tag 
-	doc_node_content
-;
-doc_node_content:
-	text_top?
-	| text_func_call
-	|
+doc_atom
+	returns [*DocAtom atom]:
+	doc_tag          
+	doc_node_content 
 	;
 
-text_func_call:
-	Id LParen RParen;
-
-doc_item:
-	doc_atom
-	| doc_list
+doc_node_content
+	returns [*FuncInvoc invoc]:
+	text_top        #anonCall
+	| text_func_call #funcCall
+	| 				 #noText
 	;
 
-doc_sexpr:
-	doc_atom
-	| doc_list
+text_func_call
+	returns [*FuncInvoc invoc]:
+	Id LParen RParen
 	;
 
-doc_list:
-	LParen doc_item* RParen 
+doc_sexpr
+	returns [*DocSexpr sexpr]:
+	doc_atom   #atom
+	| doc_list #list
+	;
+
+
+doc_list
+	returns [*DocList list]:
+	LParen doc_sexpr* RParen 
 	;

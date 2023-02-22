@@ -73,6 +73,7 @@ func execTemplate(prog parser.IProgramContext, lang string) {
 	ctx.templateName = t
 	ctx.global["import"] = prog.GetP().ImportSection
 	ctx.global["text"] = prog.GetP().TextSection
+	ctx.global["doc"] = prog.GetP().DocSection
 	golang := make(map[string]string)
 	ctx.global["golang"] = golang
 	golang["package"] = *gopkg
@@ -118,7 +119,7 @@ func readInput(path string) (*parser.WclBuildListener, *parser.WCLParser) {
 	fp, err := os.Open(path)
 	if err != nil {
 		wd, _ := os.Getwd()
-		wclFatalf("%v (wd is %s)", flag.Arg(0), err, wd)
+		wclFatalf("%v (wd is %s), %v", flag.Arg(0), wd, err)
 	}
 	buffer, err := io.ReadAll(fp)
 	if err != nil {

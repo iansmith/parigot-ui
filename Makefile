@@ -33,3 +33,6 @@ semfailtest: build/wcl
 semtest: build/wcl
 	build/wcl -o /dev/null testdata/textfunc_test.wcl
 	build/wcl -o /dev/null testdata/doc_test.wcl
+
+static/t1.wasm: cmd/t1/main.go uilib/*.go
+	GOOS=js GOARCH=wasm go build -o static/t1.wasm cmd/t1/main.go

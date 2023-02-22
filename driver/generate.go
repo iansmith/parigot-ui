@@ -1,6 +1,7 @@
 package driver
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"text/template"
@@ -66,3 +67,4 @@ func loadTemplates() (*template.Template, error) {
 	}
 	return t, nil
 }
+

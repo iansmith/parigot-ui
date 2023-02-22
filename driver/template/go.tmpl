@@ -41,10 +41,13 @@ fmt.Sprint({{.Name}})
 {{/* ----------------------------------------------------- */}}
 package {{.golang.package}}
 
+{{/* IMPORT/PREAMBLE SECTION */}}
+
 {{- if .import -}}
 {{- template "TextInline" .import.TextItem_}}
 {{- end -}}{{/* if */}}
 
+{{/* DOC SECTION */}}
 
 {{if .text }}
 {{range .text.Func}}
@@ -68,3 +71,10 @@ buf.WriteString({{ template "TextVar" . }})
 {{end}}{{/*end range over all text objects*/}}
 
 {{end}}{{/*end of if for is .text nil */}}
+
+{{/* DOC SECTION */}}
+{{if .doc }}
+{{range .doc.DocFunc}}
+func {{.Name -}}({{- template "ParamFormal" .Param -}}) string {
+    var buf bytes.Buffer
+{{ range .Item -}}

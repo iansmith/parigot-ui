@@ -77,7 +77,6 @@ func (n *NameCheck) VisitText_section(ctx *Text_sectionContext) interface{} {
 // VisitDoc_section checks that all the doc functions' names are distinct.
 func (n *NameCheck) VisitDoc_section(ctx *Doc_sectionContext) interface{} {
 	for _, node := range ctx.GetSection().DocFunc {
-		log.Printf("name check %s", node.Name)
 		ok := n.checkFuncName(node.Name, false)
 		if !ok {
 			msg := fmt.Sprintf("doc function name '%s' used more than once", node.Name)
@@ -90,6 +89,8 @@ func (n *NameCheck) VisitDoc_section(ctx *Doc_sectionContext) interface{} {
 	for _, sexpr := range ctx.AllDoc_sexpr() {
 		n.Visit(sexpr)
 	}
+	// mark objects for code generation
+	ctx.GetSection().SetParentAndNumber() //recursive traversal downward, pre-order
 	return nil
 
 }

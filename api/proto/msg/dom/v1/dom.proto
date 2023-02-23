@@ -2,9 +2,9 @@ syntax ="proto3";
 package msg.dom.v1;
 option go_package="github.com/iansmith/parigot-ui/g/msg/dom/v1;dommsg";
 
-message TextBlob {
-    string content = 1;   
-}
+// message TextBlob {
+//     string content = 1;   
+// }
 
 message Tag {
     string Name  = 1;
@@ -12,15 +12,15 @@ message Tag {
     repeated string CssClass =3;
 }
 
-message Element {
-    Tag tag = 1;
-    string text = 2;   
-    repeated Element child = 3;
-}
+// message Element {
+//     Tag tag = 1;
+//     string text = 2;   
+//     repeated Element child = 3;
+// }
 
 message Atom {
-    Element el = 1;
-    TextBlob text = 2;
+    Tag tag = 1;
+    string text = 2;
 }
 
 message List {

@@ -37,6 +37,54 @@ fmt.Sprint({{.Name}})
 {{- end }} {{/* end of template ParamFormal */}}
 
 {{/* ----------------------------------------------------- */}}
+{{- define "Atom" -}}
+    {{$tag:="span"}}
+    {{$id:=dummyId}}
+    {{$class:=zeroStrings}}
+    {{if .Atom.Tag}}
+    {{$tag = .Atom.Tag.Tag}}
+    {{$id = .Atom.Tag.Id}}
+    {{$class = .Atom.Tag.Class}}
+    {{end}}
+    n{{.Number}}:=dommsg.Atom{
+        Tag: dommsg.Tag {
+            Name:"{{$tag}}",
+            Id:"{{$id}}",
+            Class: []string{
+{{range $class}}
+    "{{.}}",
+{{end}} {{/* end of range over classes*/}}
+        },
+{{if .Atom.Invoc}}        
+        Text: {{.Atom.Invoc.Name}}(),
+{{else}}
+        Text:"",
+{{end}}{{/*end of text invocation*/}}        
+    },
+    }
+{{end}}{{/*end of template*/}}
+{{/* ----------------------------------------------------- */}}
+{{- define "ListOneLevel" -}}
+    n{{.Number}}:=&dommsg.List{
+        Children:[]*dommsg.Element{
+{{range .List.List}}
+        n{{.Number}},
+{{end}}{{/* end of ranging over the list of sexprs */}}
+        },
+    }
+{{end}}{{/*end oftemplate*/}}
+{{/* ----------------------------------------------------- */}}
+{{- define "DocSexpr" -}}
+{{if .Atom}}
+{{ template "Atom" .}}
+{{else}}{{/*other side if .Atom*/}}
+{{ template "ListOneLevel" . }}
+{{range .List.List}} 
+{{ template "DocSexpr" .}}    
+{{end}} {{/*end of list elements*/}}
+{{end}} {{/*end of if/else on .Atom */}}
+{{ end}}{{/*end of template*/}}
+{{/* ----------------------------------------------------- */}}
 {{/* PROGRAM GEN */}}
 {{/* ----------------------------------------------------- */}}
 package {{.golang.package}}
@@ -75,6 +123,12 @@ buf.WriteString({{ template "TextVar" . }})
 {{/* DOC SECTION */}}
 {{if .doc }}
 {{range .doc.DocFunc}}
-func {{.Name -}}({{- template "ParamFormal" .Param -}}) string {
-    var buf bytes.Buffer
-{{ range .Item -}}
+func {{.Name -}}() *dommsg.Sexpr {
+{{range .DocSexpr}} 
+{{template "DocSexpr" .}}
+return n0
+}
+
+{{end}} {{/* end of sexprs */}}
+{{end}} {{/*end of doc funcs*/}}
+{{end}} {{/*if doc section*/}}

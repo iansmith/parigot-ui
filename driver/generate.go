@@ -1,7 +1,6 @@
 package driver
 
 import (
-	"bytes"
 	"fmt"
 	"io"
 	"text/template"
@@ -49,7 +48,10 @@ func loadTemplates() (*template.Template, error) {
 	// create root template
 	root := template.New("root")
 	// add functions
-	//root = root.Funcs(codegen.FuncMap)
+	funcMap := template.FuncMap{}
+	funcMap["zeroStrings"] = zeroStrings
+	funcMap["dummyId"] = dummyId
+	root = root.Funcs(funcMap)
 
 	// these calls are meant to be "chained" so this construction is needed
 	// to capture the "new" value of root.
@@ -68,3 +70,14 @@ func loadTemplates() (*template.Template, error) {
 	return t, nil
 }
 
+func zeroStrings() []string {
+	return []string{}
+}
+
+var dummyNum = 0
+
+func dummyId() string {
+	result := fmt.Sprintf("dummy%08d", dummyNum)
+	dummyNum++
+	return result
+}

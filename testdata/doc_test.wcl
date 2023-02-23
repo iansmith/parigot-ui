@@ -16,9 +16,9 @@ foo{{Hello, 世界}}
 ///////////////// DOC /////////////////
 @doc
 onlyAtom <br> {{example anonymous function}}
-//onlyAtomInList (<br>)
-//atomInListWithLiteral (<br #blah :blech :foobie> {{literal string here}})
-//atomInListWithCall (<br #blah :fleazil :frik :frak :quux> foo())
+onlyAtomInList (<br>)
+atomInListWithLiteral (<br #blah :blech :foobie> {{literal string here}})
+atomInListWithCall (<br #blah :fleazil :frik :frak :quux> foo())
 //peers (
     //<h1>{{foo}}
     //<h2>{{bar}}
@@ -31,9 +31,10 @@ exampleList (<ul>
   <li>{{two}}
   <li>{{three}})
   )
-  todo (<div> (
-    <img #aa1> 
-    <span>{{item text}}
-    <span>due()
-    )
-)
+
+//  todo (<div> (
+//    <img #aa1> 
+//    <span>{{item text}}
+//    <span>due()
+//    )
+// )

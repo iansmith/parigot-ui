@@ -74,6 +74,7 @@ func execTemplate(prog parser.IProgramContext, lang string) {
 	ctx.global["import"] = prog.GetP().ImportSection
 	ctx.global["text"] = prog.GetP().TextSection
 	ctx.global["doc"] = prog.GetP().DocSection
+	ctx.global["inputFile"] = flag.Arg(0)
 	golang := make(map[string]string)
 	ctx.global["golang"] = golang
 	golang["package"] = *gopkg

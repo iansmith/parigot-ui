@@ -6,7 +6,9 @@
 /////////////////// PREAMBLE /////////////////
 @preamble {
 import (
-    "bytes"  // always required by wcl
+    "bytes"  // required by wcl text functions
+    dommsg "github.com/iansmith/parigot-ui/g/msg/dom/v1" //required by doc functions
+
 )
 }
 ///////////////// TEXT /////////////////

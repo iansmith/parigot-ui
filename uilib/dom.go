@@ -55,48 +55,12 @@ func (d *DOMService) ElemById(id string) (*dommsg.Element, js.Value, error) {
 		},
 		Text: elem.Get("innerHTML").String(),
 	}
-	// inner:=value.Get("innerHTML")
-	// if inner!="" {
-	// 	child:=value.Get("childElementCount")
-	// 	children:=value.Get(children)
-	// 	for i:=0; i<jsToIntt(child); i++ {
-	// 		newElement:=dommsg.Element{
-	// 			Tag:
-	// 		}
-	// 	}
-	// }
 
 	d.elemCache[result.Tag.Id] = result
 	d.elemIdToValue[result.Tag.Id] = elem
 	return result, elem, nil
 }
 
-// func (d *DOMService) UpdateText(elementId string, text *dommsg.TextBlob) (*Element, error) {
-// 	var elem *dommsg.Element
-// 	var err error
-// 	n := string(text.Name())
-// 	stringVersion, ok := d.textNameToElementId[n]
-// 	if !ok {
-// 		elem, err = d.ElemById(elementId)
-// 		if err != nil {
-// 			return nil, err
-// 		}
-// 		d.textNameToElementId[n] = string(elem.Id())
-// 	} else {
-// 		// we have the string version and we assume it's in cache, because we
-// 		// insert it just above in the !ok case
-// 		elem, err = d.ElemById(stringVersion)
-// 		if err != nil {
-// 			return nil, err
-// 		}
-// 	}
-// 	elem.Value().Set("innerHTML", text.Content())
-// 	return elem, nil
-// }
-
-// SetChild removes all the existing children of the given element (by Id)
-// and then sets the children to be the children provided.  An empty set of
-// children is ok as the second paramater.
 func (d *DOMService) SetChild(elementId string, child []*dommsg.Element) error {
 	_, value, err := d.ElemById(elementId)
 	if err != nil {
@@ -114,8 +78,6 @@ func (d *DOMService) SetChild(elementId string, child []*dommsg.Element) error {
 		}
 		buf.WriteString(toHtml(e))
 	}
-	print("object I've got handle to is ", value.Get("tagName").String(), "\n")
-	print("setting inner html of ", elementId, " to ", buf.String(), "\n")
 	value.Set("innerHTML", buf.String())
 	return nil
 }

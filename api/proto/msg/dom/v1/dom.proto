@@ -12,11 +12,11 @@ message Tag {
     repeated string CssClass =3;
 }
 
-// message Element {
-//     Tag tag = 1;
-//     string text = 2;   
-//     repeated Element child = 3;
-// }
+message Element {
+    Tag tag = 1;
+    string text = 2;   
+    repeated Element child = 3;
+}
 
 message Atom {
     Tag tag = 1;

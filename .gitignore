@@ -8,3 +8,4 @@ build/*
 wasm.g4
 .vscode
 g/*
+cmd/t1/generated.go

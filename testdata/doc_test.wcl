@@ -20,18 +20,18 @@ foo{{Hello, 世界}}
 onlyAtom <br> {{example anonymous function}}
 onlyAtomInList (<br>)
 atomInListWithLiteral (<br #blah :blech :foobie> {{literal string here}})
-atomInListWithCall (<br #blah :fleazil :frik :frak :quux> foo())
+//atomInListWithCall (<br #blah :fleazil :frik :frak :quux> foo())
 //peers (
     //<h1>{{foo}}
     //<h2>{{bar}}
     //<p>foo()
 //)
-//deeplyNested (<p>(<p>(<p>(<p>(<p>(<p> foo()))))))
-//silly (((((((<p>{{some content}})))))))
-exampleList (<ul> 
-    (<li>{{one}} 
-  <li>{{two}}
-  <li>{{three}})
+deeplyNested (<p>(<p>(<p>(<p>(<p>(<p> foo() ) ) ) ) ) )
+silly (((((((<p>{{some content}})))))))
+exampleList (<ul #d> 
+    (<li #a>{{one}} 
+  <li #b>{{two}}
+  <li #c>{{three}})
   )
 
 //  todo (<div> (

@@ -35,59 +35,47 @@ fmt.Sprint({{.Name}})
 {{- end }} {{/* end of ranging over param list */}}
 {{- end }} {{/*end of if */}}
 {{- end }} {{/* end of template ParamFormal */}}
-
 {{/* ----------------------------------------------------- */}}
-{{- define "Atom" -}}
-    {{$tag:="span"}}
-    {{$id:=dummyId}}
-    {{$class:=zeroStrings}}
-    {{if .Atom.Tag}}
-    {{$tag = .Atom.Tag.Tag}}
-    {{$id = .Atom.Tag.Id}}
-    {{$class = .Atom.Tag.Class}}
-    {{end}}
-    n{{.Number}}:=&dommsg.Atom{
-        Tag: &dommsg.Tag {
-            Name:"{{$tag}}",
-            Id:"{{$id}}",
-            CssClass: []string{
-{{- range $class}}
-    "{{.}}",
-{{- end}} {{/* end of range over classes*/}}
+{{- define "Tag" -}}
+    Tag: &dommsg.Tag{
+        Name: "{{.Tag}}",
+        Id:"{{.Id}}",
+        CssClass: []string{
+        {{- range .Class}}
+        "{{.}}",
+        {{- end}}
         },
     },
-{{- if .Atom.Invoc}}        
-        Text: {{.Atom.Invoc.Name}}(),
-{{- else}}
+{{end}}{{/* end of template */}}
+
+{{/* ----------------------------------------------------- */}}
+{{- define "DocElement" -}}
+{{- if not .Child}}
+    n{{.Number}}:=&dommsg.Element{
+        {{template "Tag" .Tag}}
+{{if .TextContent}}
+        Text:{{.TextContent.Name}}(),
+{{else}}
         Text:"",
-{{- end}}{{/*end of text invocation*/}}        
+{{end}}{{/* end of text content */}}
     }
-{{end}}{{/*end of template*/}}
-{{/* ----------------------------------------------------- */}}
-{{- define "ListOneLevel" -}}
-    n{{.Number}}:=&dommsg.List{
-        Sexpr:[]*dommsg.Sexpr{
-{{- range .List.List}}
-{{- if .Atom}}
-    {Atom:n{{.Number}}},
-{{- else}}
-    {List:n{{.Number}}},
-{{- end}}{{/* end of if .Atom*/}}
-{{- end}}{{/* end of ranging over the list of sexprs */}}
-    },
-}
-{{end}}{{/*end oftemplate*/}}
-{{/* ----------------------------------------------------- */}}
-{{- define "DocSexpr" -}}
-{{- if .Atom}}
-{{- template "Atom" .}}
-{{- else}}{{/*other side if .Atom*/}}
-{{- range .List.List}} 
-{{ template "DocSexpr" .}}    
+{{- else}}{{/*other side if no child */}}
+{{- range .Child}} 
+{{ template "DocElement" .}}    
 {{- end}} {{/*end of list elements*/}}
-{{- template "ListOneLevel" . }}
-{{- end}} {{/*end of if/else on .Atom */}}
-{{- end}}{{/*end of template*/}}
+
+    n{{.Number}} := &dommsg.Element{
+    {{- if .Tag}}
+        {{template "Tag" .Tag}}
+    {{- end}}
+        Child: []*dommsg.Element{
+{{- range .Child}} 
+        n{{.Number}},        
+{{- end}} {{/*end of list elements*/}}
+    }}
+
+{{- end}} {{/*end of if*/}}
+{{- end}} {{/*end of template */}}
 {{/* ----------------------------------------------------- */}}
 {{/* PROGRAM GEN */}}
 {{/* ----------------------------------------------------- */}}
@@ -103,7 +91,7 @@ package {{.golang.package}}
 {{- template "TextInline" .import.TextItem_}}
 {{- end -}}{{/* if */}}
 
-{{/* DOC SECTION */}}
+{{/* TEXT SECTION */}}
 
 {{if .text }}
 {{range .text.Func}}
@@ -131,18 +119,11 @@ buf.WriteString({{ template "TextVar" . }})
 {{/* DOC SECTION */}}
 {{if .doc }}
 {{range .doc.DocFunc}}
-func {{.Name -}}() *dommsg.Sexpr {
-{{- range .DocSexpr}} 
-{{- template "DocSexpr" .}}
-    {{if .Atom}}
-        return &dommsg.Sexpr{
-            Atom: n0,
-        }
-    {{else}}
-    return &dommsg.Sexpr{List: n0}
-    {{end}}
+func {{.Name -}}() *dommsg.Element{
+
+{{- template "DocElement" .Elem}}
+return n0
 }
 
-{{end}} {{/* end of sexprs */}}
 {{end}} {{/*end of doc funcs*/}}
-{{- end}} {{/*if doc section*/}}
+{{end}} {{/*end of if */}}

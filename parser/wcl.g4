@@ -93,7 +93,7 @@ css_decl: Id;
 
 doc_section
 	returns [*DocSectionNode section]: 
-	Doc (Id doc_sexpr)*;
+	Doc (Id doc_elem)*;
 
 doc_tag
 	returns [*DocTag tag]:
@@ -113,32 +113,25 @@ doc_class
 	(Colon Id)+
 	;
 
-doc_atom
-	returns [*DocAtom atom]:
-	doc_tag          
-	doc_node_content 
+doc_elem
+	returns [*DocElement elem]:
+	doc_tag doc_elem_content?  # haveTag
+	| doc_elem_child           # haveList
 	;
 
-doc_node_content
+doc_elem_content
+	returns [*DocElement element]:
+	doc_elem_text 
+	| doc_elem_child 
+	;
+
+doc_elem_text
 	returns [*FuncInvoc invoc]:
-	text_top        #anonCall
-	| text_func_call #funcCall
-	| 				 #noText
+	Id LParen RParen #doc_elem_text_func_call
+	| text_top       #doc_elem_text_anon
 	;
 
-text_func_call
-	returns [*FuncInvoc invoc]:
-	Id LParen RParen
-	;
-
-doc_sexpr
-	returns [*DocSexpr sexpr]:
-	doc_atom   #atom
-	| doc_list #list
-	;
-
-
-doc_list
-	returns [*DocList list]:
-	LParen doc_sexpr* RParen 
+doc_elem_child
+	returns [*DocElement elem]:
+	LParen (doc_elem)* RParen
 	;

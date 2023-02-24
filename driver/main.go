@@ -136,9 +136,9 @@ func readInput(path string) (*parser.WclBuildListener, *parser.WCLParser) {
 	p := parser.Newwcl(stream)
 	p.RemoveErrorListeners()
 	// the diagnostic listener is good for debugging (displays good error msgs)
-	// p.AddErrorListener(&antlr.DiagnosticErrorListener{
-	// 	DefaultErrorListener: &antlr.DefaultErrorListener{},
-	// })
+	p.AddErrorListener(&antlr.DiagnosticErrorListener{
+		DefaultErrorListener: &antlr.DefaultErrorListener{},
+	})
 	p.AddErrorListener(&el)
 	return &parser.WclBuildListener{}, parser.WCLParserFromWcl(p)
 

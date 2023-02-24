@@ -86,11 +86,11 @@ func (n *NameCheck) VisitDoc_section(ctx *Doc_sectionContext) interface{} {
 			return nil
 		}
 	}
-	for _, sexpr := range ctx.AllDoc_sexpr() {
-		n.Visit(sexpr)
+	for _, elem := range ctx.AllDoc_elem() {
+		n.Visit(elem)
 	}
 	// mark objects for code generation
-	ctx.GetSection().SetParentAndNumber() //recursive traversal downward, pre-order
+	ctx.GetSection().SetNumber() //recursive traversal downward, pre-order
 	return nil
 
 }

@@ -3,6 +3,7 @@ package uilib
 import (
 	"bytes"
 	"fmt"
+	"log"
 	"math"
 	"strings"
 	"syscall/js"
@@ -70,12 +71,13 @@ func (d *DOMService) SetChild(elementId string, child []*dommsg.Element) error {
 		value.Call("RemoveChild", value.Get("firstChild"))
 	}
 	buf := &bytes.Buffer{}
-	for _, e := range child {
-		t := e.GetTag()
-		if t.GetId() == "" {
-			t.Id = fmt.Sprintf("_anon_elem_%08d", d.anonCount)
-			d.anonCount++
-		}
+	for i, e := range child {
+		log.Printf("xxx child %d is %+v, %v", i, child, e.GetTag() == nil)
+		// t := e.GetTag()
+		// if t.GetId() == "" {
+		// 	t.Id = fmt.Sprintf("_anon_elem_%08d", d.anonCount)
+		// 	d.anonCount++
+		// }
 		buf.WriteString(toHtml(e))
 	}
 	value.Set("innerHTML", buf.String())
@@ -83,14 +85,17 @@ func (d *DOMService) SetChild(elementId string, child []*dommsg.Element) error {
 }
 
 func toHtml(e *dommsg.Element) string {
+	t := ""
+	end := ""
 	tag := e.GetTag()
-	allClass := &bytes.Buffer{}
-	for _, clazz := range tag.GetCssClass() {
-		allClass.WriteString(clazz + " ")
+	if tag != nil {
+		allClass := &bytes.Buffer{}
+		for _, clazz := range tag.GetCssClass() {
+			allClass.WriteString(clazz + " ")
+		}
+		t = fmt.Sprintf("<%s id=\"%s\" class=\"%s\">", tag.GetName(), tag.GetId(), allClass)
+		end = fmt.Sprintf("</%s>", tag.GetName())
 	}
-	t := fmt.Sprintf("<%s id=\"%s\" class=\"%s\">", tag.GetName(), tag.GetId(), allClass)
-	print("t is ", t, "\n")
-	end := fmt.Sprintf("</%s>", tag.GetName())
 	inner := e.GetText()
 	if inner == "" {
 		child := &bytes.Buffer{}

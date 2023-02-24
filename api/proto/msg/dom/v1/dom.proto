@@ -12,22 +12,25 @@ message Tag {
     repeated string CssClass =3;
 }
 
+// Element is actually the final type that is passed to
+// the DOM service. Normally, you want to convert your
+// tree of Sexprs into 
 message Element {
     Tag tag = 1;
     string text = 2;   
     repeated Element child = 3;
 }
 
-message Atom {
-    Tag tag = 1;
-    string text = 2;
-}
+// message Atom {
+//     Tag tag = 1;
+//     string text = 2;
+// }
 
-message List {
-    repeated Sexpr sexpr = 1;
-}
+// message List {
+//     repeated Sexpr sexpr = 1;
+// }
 
-message Sexpr {
-    Atom atom = 1;
-    List list = 2;
-}
+// message Sexpr {
+//     Atom atom = 1;
+//     List list = 2;
+// }

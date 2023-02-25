@@ -49,8 +49,6 @@ func loadTemplates() (*template.Template, error) {
 	root := template.New("root")
 	// add functions
 	funcMap := template.FuncMap{}
-	funcMap["zeroStrings"] = zeroStrings
-	funcMap["dummyId"] = dummyId
 	root = root.Funcs(funcMap)
 
 	// these calls are meant to be "chained" so this construction is needed
@@ -68,16 +66,4 @@ func loadTemplates() (*template.Template, error) {
 		}
 	}
 	return t, nil
-}
-
-func zeroStrings() []string {
-	return []string{}
-}
-
-var dummyNum = 0
-
-func dummyId() string {
-	result := fmt.Sprintf("dummy%08d", dummyNum)
-	dummyNum++
-	return result
 }

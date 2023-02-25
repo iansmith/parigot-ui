@@ -5,9 +5,6 @@
 
 ///////////////// PREAMBLE /////////////////
 @preamble {
-import (
-    "bytes"  // always required by wcl
-)
 }
 
 ///////////////// TEXT /////////////////

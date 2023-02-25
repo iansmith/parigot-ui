@@ -5,9 +5,15 @@ Text: '@text';
 CSS: '@css';
 Import: '@preamble';
 Doc: '@doc';
+Local: '@local';
+Global: '@global';
+Extern: '@extern';
 
 //ids
-Id: IdentFirst (IdentAfter)*;
+//TypeId: (TypeStarter+)? IdentFirst (IdentAfter)*;
+Id: (TypeStarter+)? IdentFirst (IdentAfter)*;
+
+fragment TypeStarter: '[' | ']'|'*';
 
 // consistent def of Ident
 fragment IdentFirst: ('a' .. 'z' | 'A' .. 'Z' | '.' | '_');
@@ -33,6 +39,8 @@ LessThan: '<';
 GreaterThan: '>';
 Colon: ':';
 Hash: '#';
+StringLit: '"' ( Esc | ~[\\"] )* '"';
+fragment Esc : '\\"' | '\\\\' ;
 
 DoubleSlashComment: '//' .+? [\n\r] -> skip;
 Whitespace: [ \n\r\t\u000B\u000C\u0000]+ -> skip;
@@ -54,3 +62,4 @@ mode VAR;
 VarLCurly: '{';
 VarRCurly: '}' -> popMode;
 VarId: IdentFirst (IdentAfter)*;
+

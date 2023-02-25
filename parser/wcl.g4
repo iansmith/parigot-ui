@@ -6,10 +6,22 @@ options {
 program
 	returns[*ProgramNode p]:
 	import_section?  
+	extern?
+	global?
 	text_section? 
 	css_section?     
 	doc_section?
 	EOF   
+	;
+
+global
+	returns [[]*PFormal g]:
+	Global param_spec
+	;
+
+extern
+	returns [[]string e]:
+	Extern LParen Id* RParen
 	;
 
 import_section
@@ -20,12 +32,17 @@ import_section
 text_section
 	returns[*TextSectionNode section]:
 	Text (
-		text_decl 
+		text_func 
 	)*;
 
-text_decl
+text_func
 	returns[*TextFuncNode f]:
-	i = Id param_spec? text_top 
+	i = Id param_spec? text_func_local? text_top 
+	;
+
+text_func_local
+	returns [[]*PFormal formal]:
+	Local param_spec
 	;
 
 text_top
@@ -93,7 +110,23 @@ css_decl: Id;
 
 doc_section
 	returns [*DocSectionNode section]: 
-	Doc (Id doc_elem)*;
+	Doc (doc_func)*;
+
+doc_func
+	returns [*DocFuncNode fn]:
+	Id doc_func_formal doc_func_local? doc_elem
+	;
+
+doc_func_local
+	returns [[]*PFormal formal]:
+	Local param_spec
+	;
+
+doc_func_formal
+	returns [[]*PFormal formal]:
+	param_spec
+	|
+	;
 
 doc_tag
 	returns [*DocTag tag]:
@@ -127,11 +160,27 @@ doc_elem_content
 
 doc_elem_text
 	returns [*FuncInvoc invoc]:
-	Id LParen RParen #doc_elem_text_func_call
+	func_invoc       #doc_elem_text_func_call
 	| text_top       #doc_elem_text_anon
 	;
 
 doc_elem_child
 	returns [*DocElement elem]:
 	LParen (doc_elem)* RParen
+	;
+
+func_invoc
+	returns [*FuncInvoc invoc]:
+	Id LParen func_actual_seq RParen
+	;
+
+func_actual_seq
+	returns [[]*FuncActual actual]:
+	( a=func_actual (Comma b=func_actual)* )?
+	;
+
+func_actual 
+	returns [*FuncActual actual]:
+	Id
+	| StringLit
 	;

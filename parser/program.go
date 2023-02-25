@@ -1,20 +1,15 @@
 package parser
 
 type ProgramNode struct {
-	ImportSection *ImportSectionNode
-	CSSSection    *CSSSectionNode
-	TextSection   *TextSectionNode
-	DocSection    *DocSectionNode
+	ImportSection          *ImportSectionNode
+	CSSSection             *CSSSectionNode
+	TextSection            *TextSectionNode
+	DocSection             *DocSectionNode
+	Extern                 []string
+	Global                 []*PFormal
+	NeedBytes, NeedElement bool
 }
 
 func NewProgramNode() *ProgramNode {
 	return &ProgramNode{}
-}
-
-type FuncInvoc struct {
-	Name string
-}
-
-func NewFuncInvoc(n string) *FuncInvoc {
-	return &FuncInvoc{Name: n}
 }

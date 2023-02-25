@@ -111,6 +111,7 @@ type TextFuncNode struct {
 	Name      string
 	NumParams int
 	Param     []*PFormal
+	Local     []*PFormal
 	_Item     []TextItem
 }
 

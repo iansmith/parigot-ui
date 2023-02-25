@@ -75,9 +75,11 @@ func execTemplate(prog parser.IProgramContext, lang string) {
 	ctx.global["text"] = prog.GetP().TextSection
 	ctx.global["doc"] = prog.GetP().DocSection
 	ctx.global["inputFile"] = flag.Arg(0)
-	golang := make(map[string]string)
+	golang := make(map[string]any)
 	ctx.global["golang"] = golang
 	golang["package"] = *gopkg
+	golang["needBytes"] = prog.GetP().NeedBytes
+	golang["needElement"] = prog.GetP().NeedElement
 	// deal with output file
 	dir, err := os.MkdirTemp(os.TempDir(), "wcl*")
 	if err != nil {

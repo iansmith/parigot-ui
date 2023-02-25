@@ -3,7 +3,6 @@ package uilib
 import (
 	"bytes"
 	"fmt"
-	"log"
 	"math"
 	"strings"
 	"syscall/js"
@@ -71,13 +70,7 @@ func (d *DOMService) SetChild(elementId string, child []*dommsg.Element) error {
 		value.Call("RemoveChild", value.Get("firstChild"))
 	}
 	buf := &bytes.Buffer{}
-	for i, e := range child {
-		log.Printf("xxx child %d is %+v, %v", i, child, e.GetTag() == nil)
-		// t := e.GetTag()
-		// if t.GetId() == "" {
-		// 	t.Id = fmt.Sprintf("_anon_elem_%08d", d.anonCount)
-		// 	d.anonCount++
-		// }
+	for _, e := range child {
 		buf.WriteString(toHtml(e))
 	}
 	value.Set("innerHTML", buf.String())

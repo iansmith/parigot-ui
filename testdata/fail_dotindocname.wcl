@@ -12,5 +12,5 @@ foo{{Hello}}
 bar{{Hello}}
 
 @doc
-baz <p>
+bar.foo <p>
 baz <hr>

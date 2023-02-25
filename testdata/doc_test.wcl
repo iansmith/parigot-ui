@@ -5,15 +5,14 @@
 
 /////////////////// PREAMBLE /////////////////
 @preamble {
-import (
-    "bytes"  // required by wcl text functions
-    dommsg "github.com/iansmith/parigot-ui/g/msg/dom/v1" //required by doc functions
-
-)
 }
 ///////////////// TEXT /////////////////
 @text
 foo{{Hello, 世界}}
+
+liTest(t []string.foo) 
+@local(a int32, b int64) 
+{{test of ${t}}}
 
 ///////////////// DOC /////////////////
 @doc
@@ -28,11 +27,14 @@ atomInListWithLiteral (<br #blah :blech :foobie> {{literal string here}})
 //)
 deeplyNested (<p>(<p>(<p>(<p>(<p>(<p> foo() ) ) ) ) ) )
 silly (((((((<p>{{some content}})))))))
-exampleList (<ul #d> 
-    (<li #a>{{one}} 
-  <li #b>{{two}}
-  <li #c>{{three}})
-  )
+exampleList(param []string) 
+@local(x string, y int)
+    (<ul #d> 
+        (<li #a>liTest("foo") 
+            <li #b>liTest(param)
+            <li #c>liTest(x)
+        )
+    )
 
 //  todo (<div> (
 //    <img #aa1> 

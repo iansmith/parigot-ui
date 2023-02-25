@@ -20,16 +20,18 @@ func NewDocSectionNode(f []*DocFuncNode) *DocSectionNode {
 }
 
 type DocFuncNode struct {
-	Name string
-	Elem *DocElement
+	Name  string
+	Elem  *DocElement
+	Param []*PFormal
+	Local []*PFormal
 }
 
 func (f *DocFuncNode) SetNumber() {
 	f.Elem.SetNumber(0)
 }
 
-func NewDocFuncNode(n string, s *DocElement) *DocFuncNode {
-	return &DocFuncNode{Name: n, Elem: s}
+func NewDocFuncNode(n string, formal []*PFormal, local []*PFormal, s *DocElement) *DocFuncNode {
+	return &DocFuncNode{Name: n, Param: formal, Local: local, Elem: s}
 }
 
 type DocElement struct {

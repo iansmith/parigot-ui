@@ -1,16 +1,14 @@
+
 //
-// Fail if text func name repeated
+// Fail if unknown tag
 //
 
 ///////////////// PREAMBLE /////////////////
 @preamble {
 }
-
+	
 ///////////////// TEXT /////////////////
-@text
-foo{{Hello}}
-bar{{Hello}}
-
 @doc
-baz <p>
-baz <hr>
+	failure <fleazil>
+	
+	

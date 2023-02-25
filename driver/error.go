@@ -11,9 +11,11 @@ type errorListener struct {
 }
 
 func (el *errorListener) SyntaxError(recognizer antlr.Recognizer, offendingSymbol interface{}, line, column int, msg string, e antlr.RecognitionException) {
-	log.Printf("syntax error %d:%d %s %v", line, column, msg, offendingSymbol)
-	buildSuccess = false
-	el.count++
+	if e != nil {
+		log.Printf("syntax error %d:%d %s %v (%T)", line, column, msg, offendingSymbol, e)
+		buildSuccess = false
+		el.count++
+	}
 }
 func (el *errorListener) ReportAmbiguity(recognizer antlr.Parser, dfa *antlr.DFA, startIndex, stopIndex int, exact bool, ambigAlts *antlr.BitSet, configs antlr.ATNConfigSet) {
 	log.Printf("ambiguous alternatives in DFA: %v", ambigAlts)

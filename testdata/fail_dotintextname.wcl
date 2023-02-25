@@ -8,9 +8,9 @@
 
 ///////////////// TEXT /////////////////
 @text
-foo{{Hello}}
+foo.quux{{Hello}}
 bar{{Hello}}
 
 @doc
-baz <p>
+fleazil <p>
 baz <hr>

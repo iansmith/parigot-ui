@@ -8,9 +8,10 @@
 
 ///////////////// TEXT /////////////////
 @text
-foo{{Hello}}
+foo(far string)
+@local(far.galaxy int) {{Hello}}
 bar{{Hello}}
 
 @doc
-baz <p>
+quux <p>
 baz <hr>

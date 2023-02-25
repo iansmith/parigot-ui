@@ -8,9 +8,9 @@
 
 ///////////////// TEXT /////////////////
 @text
-foo{{Hello}}
+foo(far.away string){{Hello}}
 bar{{Hello}}
 
 @doc
-baz <p>
+quux <p>
 baz <hr>

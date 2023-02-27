@@ -27,6 +27,7 @@ parserclean:
 
 semfailtest: build/wcl
 	build/wcl -invert testdata/fail_dupparam.wcl 
+	build/wcl -invert testdata/fail_duplocal.wcl 
 	build/wcl -invert testdata/fail_duptextname.wcl 
 	build/wcl -invert testdata/fail_duptextnameparam.wcl 
 	build/wcl -invert testdata/fail_dupdocfunc.wcl 
@@ -36,6 +37,12 @@ semfailtest: build/wcl
 	build/wcl -invert testdata/fail_dotbadformal.wcl
 	build/wcl -invert testdata/fail_dotbadlocal.wcl
 	build/wcl -invert testdata/fail_badtag.wcl
+	build/wcl -invert testdata/fail_badtextvar.wcl
+	build/wcl -invert testdata/fail_badtextvarpre.wcl
+	build/wcl -invert testdata/fail_conflictlocalparamtext.wcl
+	build/wcl -invert testdata/fail_conflictlocalnametext.wcl
+	
+	
 
 semtest: build/wcl
 	build/wcl -o /dev/null testdata/textfunc_test.wcl

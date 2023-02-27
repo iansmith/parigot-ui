@@ -8,6 +8,6 @@
 
 ///////////////// TEXT /////////////////
 @text
-foo{{Hello}}
-bar{{Hello}}
-foo{{Hello}}
+foo`Hello`
+bar`Hello`
+foo`Hello`

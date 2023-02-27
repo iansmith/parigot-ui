@@ -5,7 +5,11 @@
 
 {{/* ----------------------------------------------------- */}}
 {{- define "TextVar" -}}
+{{ if eq "result" .Name -}}
+result
+{{- else -}}
 fmt.Sprint({{.Name}})
+{{- end -}}{{/* end of test for magic result */}}
 {{- end -}} {{/* template TextVar */}}
 
 {{/* ----------------------------------------------------- */}}
@@ -85,7 +89,7 @@ import (
 {{/* ----------------------------------------------------- */}}
 {{- define "DocElement" -}}
 {{- if not .Child}}
-    n{{.Number}}:=&dommsg.Element{
+    {{- if eq 0 .Number -}}result{{- else -}}n{{- .Number -}}{{- end -}}{{/*end of if check for zero */}}:=&dommsg.Element{
         {{template "Tag" .Tag}}
 {{if .TextContent}}
         Text:{{ template "FuncInvoc" .TextContent}},
@@ -97,8 +101,7 @@ import (
 {{- range .Child}} 
 {{ template "DocElement" .}}    
 {{- end}} {{/*end of list elements*/}}
-
-    n{{.Number}} := &dommsg.Element{
+    {{ if eq 0 .Number -}}result{{- else -}}n{{- .Number -}}{{- end -}}{{/*end of if check for zero */}}:=&dommsg.Element{
     {{- if .Tag}}
         {{template "Tag" .Tag}}
     {{- end}}
@@ -134,12 +137,12 @@ import (
 {{range .text.Func}}
 func {{.Name -}}({{- template "ParamFormal" .Param -}}) string {
     {{- template "DeclareLocal" .Local}}
-    var buf bytes.Buffer
+    var result bytes.Buffer
+    {{- template "TextInline" .PreCode }}
 {{ range .Item -}}
 {{- $subtemplate := .SubTemplate -}}
-
 {{- if eq $subtemplate "TextConstant" -}}
-buf.WriteString(`{{- template "TextConstant" . -}}`)
+result.WriteString(`{{- template "TextConstant" . -}}`)
 {{ end }}{{/*TextConstant*/ -}}
 {{- if eq $subtemplate "TextVar" -}}
 buf.WriteString({{ template "TextVar" . }})
@@ -148,8 +151,9 @@ buf.WriteString({{ template "TextVar" . }})
 {{ template "TextInline" .TextItem_ }}
 {{end }} {{/*TextInline*/}}
 {{- end }} {{/* end ranging item */ -}}
-    return buf.String()
+{{- template "TextInline" .PostCode }}
 }
+    return result.String()
 {{end}}{{/*end range over all text objects*/}}
 
 {{end}}{{/*end of if for is .text nil */}}
@@ -160,8 +164,11 @@ buf.WriteString({{ template "TextVar" . }})
 {{range .doc.DocFunc}}
 func {{.Name -}}({{- template "ParamFormal" .Param -}}) *dommsg.Element{
 {{- template "DeclareLocal" .Local }}
+{{- template "TextInline" .PreCode }}
 {{- template "DocElement" .Elem}}
-return n0
+{{- template "TextInline" .PostCode }}
+
+return result
 }
 
 {{end}} {{/*end of doc funcs*/}}

@@ -10,8 +10,9 @@ import (
 
 type NameCheck struct {
 	*BasewclVisitor
-	Passed bool
-	Func   map[string]bool
+	Passed  bool
+	Func    map[string]bool
+	Program *ProgramNode
 }
 
 var _ wclVisitor = &NameCheck{}
@@ -42,6 +43,7 @@ func (n *NameCheck) VisitProgram(ctx *ProgramContext) interface{} {
 	if ctx.GetP().DocSection != nil && len(ctx.GetP().DocSection.DocFunc) > 0 {
 		ctx.p.NeedElement = true
 	}
+	n.Program = ctx.GetP()
 	return n.VisitChildren(ctx)
 }
 
@@ -61,6 +63,10 @@ func (n *NameCheck) VisitText_func(ctx *Text_funcContext) interface{} {
 // checks the Ids for dots.
 func (n *NameCheck) VisitDoc_func(ctx *Doc_funcContext) interface{} {
 	dfunc := ctx.GetFn()
+	if msg := dfunc.CheckForBadVariableUse(); msg != "" {
+		log.Printf("%s\n", msg)
+		n.Passed = false
+	}
 	if !checkFuncForCollisions(dfunc.Name, dfunc.Param, dfunc.Local, false) {
 		n.Passed = false
 	}
@@ -70,13 +76,19 @@ func (n *NameCheck) VisitDoc_func(ctx *Doc_funcContext) interface{} {
 // VisitText_section checks that all the text functions' names are distinct.
 func (n *NameCheck) VisitText_section(ctx *Text_sectionContext) interface{} {
 	for _, node := range ctx.GetSection().Func {
+		node.Section = ctx.GetSection()
 		if !n.checkForDupNames(ctx.GetParser(), ctx.BaseParserRuleContext, node.Name, true) {
 			n.Passed = false
 			return nil
 		}
 	}
 	for _, decl := range ctx.AllText_func() {
+		if msg := decl.GetF().CheckForBadVariableUse(); msg != "" {
+			log.Print(msg)
+			n.Passed = false
+		}
 		n.Visit(decl)
+
 	}
 	return nil
 }
@@ -84,14 +96,21 @@ func (n *NameCheck) VisitText_section(ctx *Text_sectionContext) interface{} {
 // VisitDoc_section checks that all the doc functions' names are distinct.
 func (n *NameCheck) VisitDoc_section(ctx *Doc_sectionContext) interface{} {
 	for _, node := range ctx.GetSection().DocFunc {
+		node.Section = ctx.GetSection()
 		if !n.checkForDupNames(ctx.GetParser(), ctx.BaseParserRuleContext, node.Name, true) {
 			n.Passed = false
 			return nil
 		}
 	}
 
-	for _, elem := range ctx.AllDoc_func() {
-		n.Visit(elem)
+	for _, f := range ctx.AllDoc_func() {
+		n.Visit(f)
+		errorMsg := n.checkFuncCallName(f.GetFn())
+		if errorMsg != "" {
+			log.Print(errorMsg)
+			n.Passed = false
+			return nil
+		}
 	}
 	// mark objects for code generation
 	ctx.GetSection().SetNumber()
@@ -100,6 +119,77 @@ func (n *NameCheck) VisitDoc_section(ctx *Doc_sectionContext) interface{} {
 }
 
 // /////////////////////////////// CHECKING FUNCTIONS
+
+func (n *NameCheck) checkFuncCallName(fn *DocFuncNode) string {
+	e := fn.Elem
+	if e.TextContent != nil {
+		if strings.HasPrefix(e.TextContent.Name, anonPrefix) {
+			return ""
+		}
+		f, ok := n.Func[e.TextContent.Name]
+		if !ok {
+			found := false
+			for _, ext := range n.Program.Extern {
+				if ext == e.TextContent.Name {
+					found = true
+					break
+				}
+			}
+			if !found {
+				return fmt.Sprintf("in function '%s', unable to find function '%s'", fn.Name, e.TextContent.Name)
+			}
+		} else { //found the name
+			if !f {
+				return fmt.Sprintf("use of doc functions to create content is currently not supported (such as '%s' in function '%s')", e.TextContent.Name, fn.Name)
+			}
+			return ""
+		}
+	}
+	return n.checkFuncCallParameters(fn, e.TextContent)
+}
+
+// checkFuncCallParameters checks that that an invocation only uses variables that are
+// known.  This is called only after we have checked that the name of the function being
+// invoced is ok.
+func (n *NameCheck) checkFuncCallParameters(fn *DocFuncNode, invoc *FuncInvoc) string {
+	if invoc == nil || invoc.Actual == nil {
+		return ""
+	}
+	for _, p := range invoc.Actual {
+		if p.Literal != "" {
+			continue
+		}
+		if formalContainsActual(fn.Local, p.Var) {
+			continue
+		}
+		if formalContainsActual(fn.Param, p.Var) {
+			continue
+		}
+		if formalContainsActual(n.Program.Global, p.Var) {
+			continue
+		}
+		found := false
+		for _, e := range n.Program.Extern {
+			if e == p.Var {
+				found = true
+				break
+			}
+		}
+		if !found {
+			return fmt.Sprintf("in function '%s', use of unknown variable '%s'", fn.Name, p.Var)
+		}
+	}
+	return ""
+}
+
+func formalContainsActual(formal []*PFormal, actual string) bool {
+	for _, f := range formal {
+		if f.Name == actual {
+			return true
+		}
+	}
+	return false
+}
 
 func (n *NameCheck) checkForDupNames(parser antlr.Parser, ctx antlr.RuleContext, funcName string, isText bool) bool {
 	ok := n.checkFuncName(funcName, isText)
@@ -126,17 +216,40 @@ func checkFuncForCollisions(name string, p []*PFormal, l []*PFormal, isText bool
 	}
 	used := make(map[string]struct{})
 	for _, param := range p {
+		// param is also name?
 		paramName := param.Name
 		if paramName == name {
 			log.Printf("cannot use '%s' as the name of a %s function and a parameter to that text function", fnType, name)
 			return false
 		}
+		// same local and param
+		if formalContainsActual(l, param.Name) {
+			log.Printf("cannot use '%s' as the name of both a local and a parameter", param.Name)
+			return false
+
+		}
+		// dup param
 		_, ok := used[paramName]
 		if ok {
 			log.Printf("in %s function '%s': duplicate parameter name '%s' ", fnType, name, paramName)
 			return false
 		}
 		used[paramName] = struct{}{}
+	}
+	for _, local := range l {
+		// local is also name?
+		localName := local.Name
+		if localName == name {
+			log.Printf("cannot use '%s' as the name of a %s function and a local to that text function", fnType, name)
+			return false
+		}
+		// dup param
+		_, ok := used[localName]
+		if ok {
+			log.Printf("in %s function '%s': duplicate local name '%s' ", fnType, name, localName)
+			return false
+		}
+		used[localName] = struct{}{}
 	}
 	msg := checkParamsAndLocalsForDot(name, p, l)
 	if msg != "" {
@@ -199,4 +312,8 @@ func (n *NameCheck) VisitChildren(ctx antlr.RuleNode) interface{} {
 		last = n.Visit(tree)
 	}
 	return last
+}
+
+func IsSelfVar(name string) bool {
+	return name == "result"
 }

@@ -108,19 +108,72 @@ func NewPFormal(n, t string) *PFormal {
 // TextFuncNode is the that alls the information about a declared
 // text function.
 type TextFuncNode struct {
-	Name      string
-	NumParams int
-	Param     []*PFormal
-	Local     []*PFormal
-	_Item     []TextItem
+	Name                     string
+	NumParams                int
+	Param                    []*PFormal
+	Local                    []*PFormal
+	Item_, PreCode, PostCode []TextItem
+	Section                  *TextSectionNode
+}
+
+func (t *TextFuncNode) CheckForBadVariableUse() string {
+	for _, seq := range [][]TextItem{t.PreCode, t.PostCode, t.Item_} {
+		for _, item := range seq {
+			switch varName := item.(type) {
+			case *TextVar:
+				msg := t.checkAllForNameDecl(varName.Name)
+				if msg != "" {
+					return msg
+				}
+			}
+		}
+	}
+	return ""
 }
 
 func (t *TextFuncNode) Item() []TextItem {
-	return t._Item
+	return t.Item_
 }
 
 func (t *TextFuncNode) SetItem(item []TextItem) {
-	t._Item = item
+	t.Item_ = item
+}
+
+func (f *TextFuncNode) checkVar(name string, formal []*PFormal) bool {
+	for _, p := range formal {
+		if p.Name == name {
+			return true
+		}
+	}
+	return false
+}
+
+func (f *TextFuncNode) checkLocal(name string) bool {
+	return f.checkVar(name, f.Local)
+}
+func (f *TextFuncNode) checkParam(name string) bool {
+	return f.checkVar(name, f.Param)
+}
+func (f *TextFuncNode) checkGlobalAndExtern(name string) bool {
+	return f.Section.Program.checkGlobalAndExtern(name)
+}
+func (f *TextFuncNode) checkAllForNameDecl(name string) string {
+	if IsSelfVar(name) {
+		return ""
+	}
+	found := f.checkLocal(name)
+	if found {
+		return ""
+	}
+	found = f.checkParam(name)
+	if found {
+		return ""
+	}
+	found = f.checkGlobalAndExtern(name)
+	if found {
+		return ""
+	}
+	return fmt.Sprintf("in text function '%s', use of unknown variable '%s'", f.Name, name)
 }
 
 func NewTextFuncNode() *TextFuncNode {
@@ -129,7 +182,8 @@ func NewTextFuncNode() *TextFuncNode {
 
 // TestSection is the collection of text functions.
 type TextSectionNode struct {
-	Func []*TextFuncNode
+	Func    []*TextFuncNode
+	Program *ProgramNode
 }
 
 func NewTextSectionNode() *TextSectionNode {

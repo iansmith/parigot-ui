@@ -37,7 +37,17 @@ text_section
 
 text_func
 	returns[*TextFuncNode f]:
-	i = Id param_spec? text_func_local? text_top 
+	i = Id param_spec? text_func_local? pre_code? text_top post_code?
+	;
+
+pre_code 
+	returns [[]TextItem item]:
+	Pre LCurly uninterp
+	;
+
+post_code 
+	returns [[]TextItem item]:
+	Post LCurly uninterp
 	;
 
 text_func_local
@@ -47,10 +57,10 @@ text_func_local
 
 text_top
 	returns[[]TextItem item]:
-	DoubleLeftCurly (
-		text_content 
+	BackTick 	(
+		text_content
 		|
-	) DoubleRightCurly;
+	) ContentBackTick ;
 
 text_content
 	returns[[]TextItem item]:
@@ -62,7 +72,6 @@ text_content_inner
 	returns[[]TextItem item]:
 		ContentRawText             	#RawText
 		| var_subs   				#VarSub
-		| ContentLCurly uninterp   	#Unint
 ;
 
 var_subs
@@ -72,13 +81,13 @@ var_subs
 
 sub
 	returns [TextItem item]: 
-	VarLCurly VarId VarRCurly
+	VarId VarRCurly
 	;
 
 uninterp
 	returns[[]TextItem item]:
 	(
-		uninterp_inner
+		uninterp_inner  
 	)+ UninterpRCurly;
 
 uninterp_inner 
@@ -90,7 +99,7 @@ uninterp_inner
 
 uninterp_var
 	returns[[]TextItem item]: 
-	UninterpDollar Id;
+	UninterpDollar VarId VarRCurly;
 
 param_spec
 	returns[[]*PFormal formal]: 
@@ -114,7 +123,7 @@ doc_section
 
 doc_func
 	returns [*DocFuncNode fn]:
-	Id doc_func_formal doc_func_local? doc_elem
+	Id doc_func_formal pre_code? doc_func_local? doc_elem post_code?
 	;
 
 doc_func_local

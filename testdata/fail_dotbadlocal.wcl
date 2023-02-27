@@ -9,7 +9,7 @@
 ///////////////// TEXT /////////////////
 @text
 foo(far string)
-@local(far.galaxy int) {{Hello}}
+@local(far.galaxy int) `Hello`
 bar{{Hello}}
 
 @doc

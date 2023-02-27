@@ -1,5 +1,6 @@
+
 //
-// Fail if text func name repeated
+// Fail if param name repeated
 //
 
 ///////////////// PREAMBLE /////////////////
@@ -8,9 +9,5 @@
 
 ///////////////// TEXT /////////////////
 @text
-foo(far.away string)`Hello`
-bar`Hello`
-
-@doc
-quux <p>
-baz <hr>
+@local(x int, x string)
+foo(baz string,bar string)`Hello`

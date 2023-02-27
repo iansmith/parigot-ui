@@ -8,8 +8,8 @@
 
 ///////////////// TEXT /////////////////
 @text
-foo{{Hello}}
-bar{{Hello}}
+foo`Hello`
+bar`Hello`
 @doc
 baz (<p>)
 foo (<h1>)

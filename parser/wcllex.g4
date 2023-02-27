@@ -8,6 +8,8 @@ Doc: '@doc';
 Local: '@local';
 Global: '@global';
 Extern: '@extern';
+Pre: '@pre';
+Post: '@post';
 
 //ids
 //TypeId: (TypeStarter+)? IdentFirst (IdentAfter)*;
@@ -28,7 +30,6 @@ fragment IdentAfter: (
 
 fragment Digit: '0' ..'9';
 
-DoubleLeftCurly: '{{' -> pushMode(CONTENT);
 LCurly: '{' -> pushMode(UNINTERPRETED);
 RCurly: '}';
 LParen: '(';
@@ -39,6 +40,7 @@ LessThan: '<';
 GreaterThan: '>';
 Colon: ':';
 Hash: '#';
+BackTick: '`' -> pushMode(CONTENT);
 StringLit: '"' ( Esc | ~[\\"] )* '"';
 fragment Esc : '\\"' | '\\\\' ;
 
@@ -46,20 +48,17 @@ DoubleSlashComment: '//' .+? [\n\r] -> skip;
 Whitespace: [ \n\r\t\u000B\u000C\u0000]+ -> skip;
 
 mode CONTENT;
-ContentRawText: ~[${}]+;
-ContentDollar: '$' -> pushMode(VAR);
-ContentLCurly: '{' -> pushMode(UNINTERPRETED);
-DoubleRightCurly: '}}' -> popMode;
-//ContentRCurly: '}' -> popMode;
+ContentRawText: ~[${`]+;
+ContentDollar: '${' -> pushMode(VAR);
+ContentBackTick: '`' -> popMode;
 
 mode UNINTERPRETED;
-UninterpRawText: ~[{}]+;
+UninterpRawText: ~[${}]+;
+UninterpDollar: '${' -> pushMode(VAR) ;
 UninterpLCurly: '{' -> pushMode(UNINTERPRETED);
 UninterpRCurly: '}' -> popMode;
-UninterpDollar: '$' -> pushMode(VAR);
 
 mode VAR;
-VarLCurly: '{';
 VarRCurly: '}' -> popMode;
 VarId: IdentFirst (IdentAfter)*;
 

@@ -123,7 +123,7 @@ doc_section
 
 doc_func
 	returns [*DocFuncNode fn]:
-	Id doc_func_formal pre_code? doc_func_local? doc_elem post_code?
+	Id doc_func_formal doc_func_local? pre_code? doc_elem post_code?
 	;
 
 doc_func_local

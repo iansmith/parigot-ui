@@ -37,16 +37,18 @@ semfailtest: build/wcl
 	build/wcl -invert testdata/fail_dotbadformal.wcl
 	build/wcl -invert testdata/fail_dotbadlocal.wcl
 	build/wcl -invert testdata/fail_badtag.wcl
-	build/wcl -invert testdata/fail_badtextvar.wcl
+	build/wcl -invert testdata/fail_baddocvar.wcl
 	build/wcl -invert testdata/fail_badtextvarpre.wcl
+	build/wcl -invert testdata/fail_badtextvarpost.wcl
 	build/wcl -invert testdata/fail_conflictlocalparamtext.wcl
 	build/wcl -invert testdata/fail_conflictlocalnametext.wcl
-	
+	@echo "PASS"
 	
 
 semtest: build/wcl
 	build/wcl -o /dev/null testdata/textfunc_test.wcl
-	build/wcl -o /dev/null testdata/doc_test.wcl
+	build/wcl -o /dev/null testdata/docfunc_test.wcl
+	@echo PASS
 
 static/t1.wasm: cmd/t1/main.go uilib/*.go
 	GOOS=js GOARCH=wasm go build -o static/t1.wasm cmd/t1/main.go

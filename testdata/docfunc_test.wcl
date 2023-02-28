@@ -34,12 +34,13 @@ textTest(t string, a string)
 // peers forms three elements that end up as peers in the tree
 // tests the @pre and @post
 peers(a int64) 
+@local(b int64, c int64)
 @pre{
-    b:=a>>32
-    c:=a&0xffffffff
+    ${b}=${a}>>32
+    ${c}=${a}&0xffffffff
 }
- (<h1>{{foo}}
-    <h2>{{bar}}
+ (<h1>`foo`
+    <h2>`bar`
     <p>foo()
 )
 @post{

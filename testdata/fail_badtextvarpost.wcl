@@ -1,6 +1,6 @@
 
 //
-// Fail if unknown variable
+// Fail if unknown variable (check pre code)
 //
 
 ///////////////// PREAMBLE /////////////////
@@ -16,8 +16,15 @@
 
 ///////////////// TEXT /////////////////
 @text
-	example(a string, b string)
+
+redherring(fleazil string) 
+	`no relation to the other ${fleazil}`
+
+example(a string, b string)
 	@local(c string, d string, e string)
-	` this is a test of variable ${checking} `
+	` this is a test of bad var in the pre code `
+	@post{
+		${result}=${fleazil}
+	}
 	
 	

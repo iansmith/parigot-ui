@@ -152,8 +152,8 @@ buf.WriteString({{ template "TextVar" . }})
 {{end }} {{/*TextInline*/}}
 {{- end }} {{/* end ranging item */ -}}
 {{- template "TextInline" .PostCode }}
-}
     return result.String()
+}
 {{end}}{{/*end range over all text objects*/}}
 
 {{end}}{{/*end of if for is .text nil */}}

@@ -1,6 +1,6 @@
 
 //
-// Fail if there is a param and local with same name
+// Fail if unknown variable
 //
 
 ///////////////// PREAMBLE /////////////////
@@ -15,11 +15,12 @@
 
 
 ///////////////// TEXT /////////////////
-@text
-foo ` red herring `
-
-example(a string, b string)
-	@local(c string, d string, example string)
-	` can't make a local the same name as function `
+@doc
+	example(a string, b string)
+	@local(c9 string)
+	@pre{
+		 c9=${checking}
+	}
+	
 	
 	

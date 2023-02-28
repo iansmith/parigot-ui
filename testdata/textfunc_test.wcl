@@ -14,11 +14,13 @@ var verbose = true
 
 ///////////////// TEXT /////////////////
 @text
-foo{{Hello, 世界 ${chinese}}}
-bar{{test1{
-    if verbose {
-        moreTest1()
-    }
-    }}}
+foo(chinese string)
+    `Hello, 世界 ${chinese}`
+bar `test1`
 howdy(baz string, firstName string, lastName string) 
-{{ Greetings ${salutation} ${firstName} ${lastName} }}
+@pre{
+    if !verbose {
+        return ""
+    }
+}
+    ` Greetings ${salutation} ${firstName} ${lastName}`

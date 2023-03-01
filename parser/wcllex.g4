@@ -34,7 +34,7 @@ LCurly: '{' -> pushMode(UNINTERPRETED);
 RCurly: '}';
 LParen: '(';
 RParen: ')';
-Dollar: '$';
+Dollar: '${' -> pushMode(VAR);
 Comma: ',';
 LessThan: '<';
 GreaterThan: '>';

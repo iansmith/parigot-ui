@@ -92,6 +92,7 @@ func NewDocFuncNode(n string, formal []*PFormal, local []*PFormal, s *DocElement
 }
 
 type DocElement struct {
+	Var         string // exclusive
 	Number      int
 	Tag         *DocTag
 	TextContent *FuncInvoc
@@ -116,14 +117,21 @@ func (e *DocElement) SetNumber(n int) int {
 }
 
 type DocTag struct {
-	Tag   string
+	Tag   *DocIdOrVar
 	Id    string
 	Class []string
 }
 
-func NewDocTag(tag string, id string, class []string) (*DocTag, error) {
-	if !validTag(tag) {
-		return nil, fmt.Errorf("unknown tag '%s'", tag)
+type DocIdOrVar struct {
+	Name  string
+	IsVar bool
+}
+
+func NewDocTag(tag *DocIdOrVar, id string, class []string) (*DocTag, error) {
+	if !tag.IsVar {
+		if !validTag(tag.Name) {
+			return nil, fmt.Errorf("unknown tag '%s'", tag.Name)
+		}
 	}
 	return &DocTag{Tag: tag, Id: id, Class: class}, nil
 }

@@ -1,11 +1,11 @@
 package parser
 
 type FuncInvoc struct {
-	Name   string
+	Name   *DocIdOrVar
 	Actual []*FuncActual
 }
 
-func NewFuncInvoc(n string, actual []*FuncActual) *FuncInvoc {
+func NewFuncInvoc(n *DocIdOrVar, actual []*FuncActual) *FuncInvoc {
 	return &FuncInvoc{Name: n, Actual: actual}
 }
 

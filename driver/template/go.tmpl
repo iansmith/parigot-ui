@@ -49,8 +49,11 @@ var {{ .Name }} {{ .Type -}}
 {{- end }} {{/* end of template ParamFormal */}}
 {{/* ----------------------------------------------------- */}}
 {{- define "Tag" -}}
+    {{if .Tag.IsVar}}
+        Tag: {{.Tag.Name}},
+    {{else}}
     Tag: &dommsg.Tag{
-        Name: "{{.Tag}}",
+        Name: "{{.Tag.Name}}",
         Id:"{{.Id}}",
         CssClass: []string{
         {{- range .Class}}
@@ -58,6 +61,7 @@ var {{ .Name }} {{ .Type -}}
         {{- end}}
         },
     },
+{{end}}{{/* end possible variable */}}
 {{end}}{{/* end of template */}}
 {{/* ----------------------------------------------------- */}}
 {{- define "Package" -}}
@@ -76,7 +80,7 @@ import (
 {{end}}
 {{/* ----------------------------------------------------- */}}
 {{- define "FuncInvoc" -}}
-    {{.Name}}(
+    {{.Name.Name}}(
     {{- range .Actual -}}
     {{- if .Var -}}
     {{.Var}},
@@ -89,14 +93,18 @@ import (
 {{/* ----------------------------------------------------- */}}
 {{- define "DocElement" -}}
 {{- if not .Child}}
-    {{- if eq 0 .Number -}}result{{- else -}}n{{- .Number -}}{{- end -}}{{/*end of if check for zero */}}:=&dommsg.Element{
-        {{template "Tag" .Tag}}
+    {{- if eq 0 .Number -}}result{{- else -}}n{{- .Number -}}{{- end -}}{{/*end of if check for zero */}}:=
+{{- if .Var -}}
+    {{- .Var -}}
+{{- else }}
+        &dommsg.Element{ {{template "Tag" .Tag}}
 {{if .TextContent}}
         Text:{{ template "FuncInvoc" .TextContent}},
 {{else}}
         Text:"",
 {{end}}{{/* end of text content */}}
     }
+{{end}}{{/* end of if .Var */}}
 {{- else}}{{/*other side if no child */}}
 {{- range .Child}} 
 {{ template "DocElement" .}}    

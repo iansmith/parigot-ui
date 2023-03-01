@@ -139,10 +139,21 @@ doc_func_formal
 
 doc_tag
 	returns [*DocTag tag]:
-	LessThan Id 
+	LessThan id_or_var_ref
 	doc_id?
 	doc_class?
 	GreaterThan 
+	;
+
+id_or_var_ref
+	returns [*DocIdOrVar idVar]:
+	Id
+	| var_ref
+	;
+
+var_ref
+	returns [*DocIdOrVar v]:
+	Dollar VarId VarRCurly
 	;
 
 doc_id
@@ -157,8 +168,9 @@ doc_class
 
 doc_elem
 	returns [*DocElement elem]:
-	doc_tag doc_elem_content?  # haveTag
-	| doc_elem_child           # haveList
+	var_ref                      # haveVar
+	| doc_tag doc_elem_content?  # haveTag
+	| doc_elem_child             # haveList
 	;
 
 doc_elem_content

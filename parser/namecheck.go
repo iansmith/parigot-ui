@@ -123,27 +123,33 @@ func (n *NameCheck) VisitDoc_section(ctx *Doc_sectionContext) interface{} {
 func (n *NameCheck) checkFuncCallName(fn *DocFuncNode) string {
 	e := fn.Elem
 	if e.TextContent != nil {
-		if strings.HasPrefix(e.TextContent.Name, anonPrefix) {
+		if !e.TextContent.Name.IsVar && strings.HasPrefix(e.TextContent.Name.Name, anonPrefix) {
 			return ""
 		}
-		f, ok := n.Func[e.TextContent.Name]
-		if !ok {
-			found := false
-			for _, ext := range n.Program.Extern {
-				if ext == e.TextContent.Name {
-					found = true
-					break
+		// is it a variable ref?
+		if e.TextContent.Name.IsVar {
+			return fmt.Sprintf("You cannot use variable '%s' as the name of a function currently", e.TextContent.Name.Name)
+		} else {
+			f, ok := n.Func[e.TextContent.Name.Name]
+			if !ok {
+				found := false
+				for _, ext := range n.Program.Extern {
+					if ext == e.TextContent.Name.Name {
+						found = true
+						break
+					}
 				}
+				if !found {
+					return fmt.Sprintf("in function '%s', unable to find function '%s'", fn.Name, e.TextContent.Name.Name)
+				}
+			} else { //found the name
+				if !f {
+					return fmt.Sprintf("use of doc functions to create content is currently not supported (such as '%s' in function '%s')", e.TextContent.Name.Name, fn.Name)
+				}
+				return ""
 			}
-			if !found {
-				return fmt.Sprintf("in function '%s', unable to find function '%s'", fn.Name, e.TextContent.Name)
-			}
-		} else { //found the name
-			if !f {
-				return fmt.Sprintf("use of doc functions to create content is currently not supported (such as '%s' in function '%s')", e.TextContent.Name, fn.Name)
-			}
-			return ""
 		}
+
 	}
 	return n.checkFuncCallParameters(fn, e.TextContent)
 }

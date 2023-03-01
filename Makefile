@@ -13,7 +13,14 @@ parser/wcl_parser.go: parser/wcl.g4
 parser/wcllex_lexer.go: parser/wcllex.g4 
 	cd parser;./generate.sh
 
-build/wcl: driver/*.go driver/template/*.tmpl parser/*.go parser/wcl_parser.go parser/wcllex_lexer.go
+css/css3_lexer.go: css/css3.g4
+	cd css;./generate.sh
+
+css/css3_parser.go: css/css3.g4
+	cd css;./generate.sh
+
+build/wcl: driver/*.go driver/template/*.tmpl parser/*.go parser/wcl_parser.go parser/wcllex_lexer.go \
+	css/css3_lexer.go css/css3_parser.go css/*.go
 	go build -o build/wcl github.com/iansmith/parigot-ui/cmd/wcl
 
 

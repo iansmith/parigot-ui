@@ -5,6 +5,7 @@ options {
 
 program
 	returns[*ProgramNode p]:
+	css_section?
 	import_section?  
 	extern?
 	global?
@@ -29,6 +30,13 @@ import_section
 	Import LCurly uninterp 
 	;
 
+css_section:
+	CSS (css_filespec)*
+	;
+
+css_filespec:
+	Plus StringLit 
+	;
 text_section
 	returns[*TextSectionNode section]:
 	Text (
@@ -111,11 +119,6 @@ param_pair
 	| n=Id t=Id         #Last
 	;
 
-css_section: CSS css_file*;
-
-css_file: Id LCurly css_decl* RCurly;
-
-css_decl: Id;
 
 doc_section
 	returns [*DocSectionNode section]: 

@@ -40,6 +40,7 @@ LessThan: '<';
 GreaterThan: '>';
 Colon: ':';
 Hash: '#';
+Plus: '+';
 BackTick: '`' -> pushMode(CONTENT);
 StringLit: '"' ( Esc | ~[\\"] )* '"';
 fragment Esc : '\\"' | '\\\\' ;

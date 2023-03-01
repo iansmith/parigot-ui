@@ -2,6 +2,12 @@
 //
 // TestCase for the basics of docs
 //
+/////////////////// CSS /////////////////
+// path is relative to this file
+@css 
+    +"../static/css/bootstrap.css"
+    +"../static/css/bootstrap-grid.css"
+
 
 /////////////////// PREAMBLE /////////////////
 @preamble {

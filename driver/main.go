@@ -142,6 +142,6 @@ func readInput(path string) (*parser.WclBuildListener, *parser.WCLParser) {
 		DefaultErrorListener: &antlr.DefaultErrorListener{},
 	})
 	p.AddErrorListener(&el)
-	return &parser.WclBuildListener{}, parser.WCLParserFromWcl(p)
+	return parser.NewWclBuildListener(), parser.WCLParserFromWcl(p)
 
 }
